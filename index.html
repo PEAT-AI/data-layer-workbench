@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Layer Workbench — Plantix</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; font-size: 14px; }
+
+/* TOP BAR */
+.top-bar {
+  background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+}
+.top-bar-left { display: flex; align-items: center; gap: 16px; }
+.top-bar-left h1 { font-size: 18px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
+.last-saved { font-size: 11px; color: #94a3b8; }
+.top-bar-right { display: flex; gap: 8px; align-items: center; }
+.btn {
+  padding: 7px 16px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff;
+  font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; color: #475569;
+  transition: all 0.15s;
+}
+.btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.btn.active { background: #1e293b; color: #fff; border-color: #1e293b; }
+.btn.active:hover { background: #334155; }
+.separator { width: 1px; height: 20px; background: #e2e8f0; }
+
+/* BREADCRUMBS */
+.breadcrumbs {
+  padding: 10px 28px; background: #fff; border-bottom: 1px solid #e2e8f0;
+  font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 6px;
+}
+.breadcrumbs a { color: #2563eb; text-decoration: none; cursor: pointer; font-weight: 500; }
+.breadcrumbs a:hover { text-decoration: underline; }
+.breadcrumbs .sep { color: #cbd5e1; }
+.breadcrumbs .current { color: #1e293b; font-weight: 600; }
+
+/* MAIN LAYOUT */
+.main-layout { display: flex; min-height: calc(100vh - 100px); }
+.content-area {
+  flex: 1; padding: 28px 32px; overflow-y: auto;
+  transition: opacity 0.2s ease;
+}
+.content-area.fading { opacity: 0; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px; min-width: 260px; background: #fff; border-left: 1px solid #e2e8f0;
+  padding: 20px 16px; overflow-y: auto; position: sticky; top: 100px;
+  height: calc(100vh - 100px);
+}
+.sidebar-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+  color: #94a3b8; margin-bottom: 16px;
+}
+.sidebar-layer {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border-radius: 8px; cursor: pointer; transition: background 0.15s; margin-bottom: 2px;
+}
+.sidebar-layer:hover { background: #f1f5f9; }
+.sidebar-layer.active { background: #eff6ff; }
+.sidebar-layer .name { font-size: 13px; font-weight: 500; color: #334155; flex: 1; }
+.sidebar-layer .icon { font-size: 14px; flex-shrink: 0; }
+
+/* CARDS */
+.cards-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
+  padding: 24px; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.card:hover {
+  border-color: #bfdbfe; box-shadow: 0 4px 16px rgba(37,99,235,0.08);
+  transform: translateY(-2px);
+}
+
+/* PERSONA CARDS */
+.persona-card .persona-icon { font-size: 36px; margin-bottom: 16px; }
+.persona-card .persona-name { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+.persona-card .persona-count { font-size: 13px; color: #64748b; }
+.persona-card .layer-count { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+/* USE CASE CARDS */
+.usecase-card { cursor: default; }
+.usecase-card .role { font-size: 12px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.usecase-card .story-text {
+  font-size: 14px; color: #334155; margin-bottom: 16px; line-height: 1.6; min-height: 42px;
+}
+.usecase-card .story-text[contenteditable="true"]:focus {
+  outline: 2px solid #bfdbfe; border-radius: 4px; padding: 4px;
+}
+.data-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.data-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+}
+.data-chip:hover { background: #e2e8f0; }
+.data-chip .chip-remove {
+  font-size: 10px; color: #94a3b8; margin-left: 2px; font-weight: 700;
+}
+.data-chip .chip-remove:hover { color: #ef4444; }
+/* USE CASE TAGS */
+.uc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; align-items: center; position: relative; }
+.uc-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.3px;
+  background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+}
+.uc-tag .tag-remove {
+  font-size: 9px; color: #94a3b8; cursor: pointer; margin-left: 2px; font-weight: 700;
+}
+.uc-tag .tag-remove:hover { color: #ef4444; }
+.add-tag-btn {
+  padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600;
+  cursor: pointer; border: 1px dashed #cbd5e1; background: #fff; color: #94a3b8;
+  transition: all 0.15s;
+}
+.add-tag-btn:hover { border-color: #2563eb; color: #2563eb; }
+.tag-dropdown {
+  position: absolute; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1); padding: 6px; z-index: 50; min-width: 160px;
+}
+.tag-dropdown-item {
+  padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #334155;
+  cursor: pointer; transition: background 0.1s;
+}
+.tag-dropdown-item:hover { background: #f1f5f9; }
+.tag-dropdown-new {
+  display: flex; gap: 4px; padding: 6px; border-top: 1px solid #e2e8f0; margin-top: 4px;
+}
+.tag-dropdown-new input {
+  flex: 1; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px;
+  font-family: inherit; font-size: 11px;
+}
+.tag-dropdown-new input:focus { outline: none; border-color: #93c5fd; }
+.tag-dropdown-new button {
+  padding: 4px 10px; border: none; background: #2563eb; color: #fff;
+  border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer;
+}
+
+.edit-layers-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; border: 1px dashed #cbd5e1;
+  background: #fff; color: #94a3b8;
+}
+.edit-layers-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+.layer-picker { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.layer-pick {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+  background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0;
+}
+.layer-pick.selected { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+.layer-pick:hover { border-color: #93c5fd; }
+
+/* DATA LAYER DETAIL */
+.layer-detail { max-width: 840px; }
+.layer-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+.layer-header .layer-icon { font-size: 40px; }
+.layer-header .layer-name { font-size: 24px; font-weight: 700; color: #0f172a; }
+
+
+.section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+  color: #94a3b8; margin-bottom: 12px; margin-top: 28px;
+}
+
+.notes-area {
+  width: 100%; min-height: 60px; padding: 12px; border: 1px solid #e2e8f0;
+  border-radius: 8px; font-family: inherit; font-size: 13px; color: #334155;
+  resize: vertical; background: #fff; line-height: 1.5;
+}
+.notes-area:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+/* REVERSE LINKS */
+.reverse-links { margin-top: 12px; }
+.reverse-link-group { margin-bottom: 12px; }
+.reverse-link-persona {
+  font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.reverse-link-item {
+  padding: 8px 12px; margin-left: 16px; margin-bottom: 4px;
+  background: #f8fafc; border-radius: 6px; font-size: 12px; color: #475569;
+  cursor: pointer; transition: background 0.15s;
+}
+.reverse-link-item:hover { background: #eff6ff; color: #2563eb; }
+
+/* TASKS */
+.task-list { margin-top: 12px; }
+.task-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+  margin-bottom: 8px; transition: all 0.15s;
+}
+.task-item:hover { border-color: #cbd5e1; }
+.task-item.is-next { border-left: 3px solid #2563eb; background: #fafbff; }
+.task-checkbox {
+  width: 18px; height: 18px; border-radius: 4px; border: 2px solid #cbd5e1;
+  cursor: pointer; flex-shrink: 0; margin-top: 2px; display: flex;
+  align-items: center; justify-content: center; transition: all 0.15s; background: #fff;
+}
+.task-checkbox.checked { background: #1e293b; border-color: #1e293b; }
+.task-checkbox.checked::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 700; }
+.task-content { flex: 1; min-width: 0; }
+.task-desc { font-size: 13px; color: #334155; margin-bottom: 6px; line-height: 1.5; }
+.task-desc[contenteditable="true"]:focus {
+  outline: 2px solid #bfdbfe; border-radius: 4px; padding: 2px 4px;
+}
+.task-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.source-pill {
+  padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.source-pill.plantix { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.source-pill.plantix.inactive { background: #f8fafc; color: #cbd5e1; border-color: #e2e8f0; }
+.source-pill.external { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.source-pill.external.inactive { background: #f8fafc; color: #cbd5e1; border-color: #e2e8f0; }
+.source-pill.derived { background: #faf5ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+.source-pill.derived.inactive { background: #f8fafc; color: #cbd5e1; border-color: #e2e8f0; }
+
+.next-toggle {
+  padding: 2px 10px; border-radius: 4px; font-size: 10px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+  border: 1px solid #e2e8f0; background: #fff; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.next-toggle.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+.next-toggle:hover { border-color: #2563eb; }
+
+.assignee-input {
+  padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0;
+  font-family: inherit; font-size: 12px; color: #475569; background: #f8fafc;
+  width: 200px; transition: border-color 0.15s;
+}
+.assignee-input:focus { outline: none; border-color: #93c5fd; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.assignee-input::placeholder { color: #94a3b8; font-style: italic; }
+
+.task-actions { display: flex; gap: 4px; flex-shrink: 0; margin-top: 2px; }
+.task-delete {
+  background: none; border: none; cursor: pointer; color: #cbd5e1; font-size: 14px;
+  padding: 2px 4px; border-radius: 4px; transition: all 0.15s;
+}
+.task-delete:hover { color: #ef4444; background: #fef2f2; }
+
+.add-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; border: 1px dashed #cbd5e1;
+  background: #fff; font-family: inherit; font-size: 12px; font-weight: 500;
+  cursor: pointer; color: #64748b; transition: all 0.15s; margin-top: 8px;
+}
+.add-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+
+/* NEXT UP VIEW */
+.next-up-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.next-up-header h2 { font-size: 20px; font-weight: 700; color: #0f172a; }
+.next-up-header .count {
+  font-size: 13px; color: #64748b; background: #f1f5f9; padding: 4px 12px; border-radius: 6px;
+}
+.next-up-group { margin-bottom: 28px; }
+.next-up-group-title {
+  font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.next-up-group-title .layer-link {
+  font-size: 12px; color: #2563eb; cursor: pointer; font-weight: 500;
+}
+.next-up-group-title .layer-link:hover { text-decoration: underline; }
+.next-up-empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+.next-up-empty p { font-size: 14px; margin-bottom: 8px; }
+.next-up-empty .hint { font-size: 12px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+.modal {
+  background: #fff; border-radius: 12px; padding: 24px; width: 480px;
+  max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.modal textarea {
+  width: 100%; min-height: 80px; padding: 10px; border: 1px solid #e2e8f0;
+  border-radius: 8px; font-family: inherit; font-size: 13px; resize: vertical;
+}
+.modal textarea:focus { outline: none; border-color: #93c5fd; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.btn-primary {
+  padding: 8px 20px; border-radius: 8px; border: none; background: #2563eb;
+  color: #fff; font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-primary:hover { background: #1d4ed8; }
+
+.hidden-input { display: none; }
+
+@media print {
+  .top-bar, .breadcrumbs, .sidebar, .modal-overlay { display: none !important; }
+  .main-layout { display: block !important; }
+  .content-area { padding: 0 !important; }
+  .task-item { break-inside: avoid; }
+  .next-up-group { break-inside: avoid; }
+  body { background: #fff; font-size: 12px; }
+  .task-delete, .next-toggle, .edit-layers-btn, .add-btn { display: none !important; }
+  .assignee-input { border: none; background: none; padding: 0; font-size: 11px; }
+  .source-pill { cursor: default; }
+}
+body.readonly .add-btn,
+body.readonly .add-tag-btn,
+body.readonly .edit-layers-btn,
+body.readonly .task-delete,
+body.readonly .next-toggle,
+body.readonly .tag-remove,
+body.readonly .top-bar-right .btn:not(#nextUpBtn),
+body.readonly .tag-dropdown,
+body.readonly .layer-picker { display: none !important; }
+body.readonly .story-text[contenteditable] { cursor: default; }
+body.readonly .task-desc[contenteditable] { cursor: default; }
+body.readonly .assignee-input { border: none; background: transparent; pointer-events: none; padding-left: 0; }
+body.readonly .source-pill { pointer-events: none; cursor: default; }
+body.readonly .task-checkbox { pointer-events: none; cursor: default; }
+body.readonly .top-bar-right { gap: 0; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1>Data Layer Workbench</h1>
+    <span class="last-saved" id="lastSaved"></span>
+  </div>
+  <div class="top-bar-right">
+    <button class="btn" id="nextUpBtn" onclick="toggleNextUp()">Next Up</button>
+    <button class="btn" onclick="printNextUp()">Print Next Up</button>
+    <span class="separator"></span>
+    <button class="btn" onclick="exportData()">Export</button>
+    <button class="btn" onclick="document.getElementById('importInput').click()">Import</button>
+    <button class="btn" onclick="resetData()" style="color:#dc2626">Reset</button>
+    <input type="file" id="importInput" class="hidden-input" accept=".json" onchange="importData(event)">
+  </div>
+</div>
+
+<div class="breadcrumbs" id="breadcrumbs"><span class="current">Personas</span></div>
+
+<div class="main-layout">
+  <div class="content-area" id="content"></div>
+  <div class="sidebar" id="sidebar"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'plantix-dlw-v5';
+const IS_READONLY = new URLSearchParams(window.location.search).get('mode') === 'view';
+const BAKED_DATA = null;
+
+// ============================================================
+// DEFAULT DATA — PERSONAS
+// ============================================================
+const DEFAULT_PERSONAS = [
+  { id: 'farmer', name: 'Farmer', icon: '👨‍🌾' },
+  { id: 'crop-protection', name: 'Crop Protection (+Herbicides) Company', icon: '🛡️' },
+  { id: 'seed', name: 'Seed Companies', icon: '🌱' },
+  { id: 'fertilizer', name: 'Fertilizer / Bio-Stimulant Companies', icon: '🌿' },
+  { id: 'commodity', name: 'Commodity Traders / Food Processors', icon: '📦' }
+];
+
+// ============================================================
+// DEFAULT DATA — USE CASES
+// ============================================================
+const DEFAULT_USE_CASES = [
+  // ── Farmer ──
+  { id: 'fm-1', personaId: 'farmer', role: 'Farmer', text: 'Diagnose what disease or pest is affecting my crop from a photo', layers: ['disease-incidences', 'treatment'] },
+  { id: 'fm-2', personaId: 'farmer', role: 'Farmer', text: 'Get the right treatment recommendation and product dosage for my field size', layers: ['treatment', 'acreage'] },
+  { id: 'fm-3', personaId: 'farmer', role: 'Farmer', text: 'Know what growth stage my crop is in and what to do next', layers: ['growth-stage', 'crop-calendar'] },
+  { id: 'fm-4', personaId: 'farmer', role: 'Farmer', text: 'Get timely alerts about disease outbreaks spreading in my area', layers: ['disease-incidences', 'weather'] },
+  { id: 'fm-5', personaId: 'farmer', role: 'Farmer', text: 'Know the best sowing window for my crop and region', layers: ['sowing-date', 'crop-calendar', 'weather'] },
+  { id: 'fm-6', personaId: 'farmer', role: 'Farmer', text: 'Understand weather impact on my crop and plan accordingly', layers: ['weather', 'growth-stage'] },
+  { id: 'fm-7', personaId: 'farmer', role: 'Farmer', text: 'Learn from short educational videos and tips about my specific crop problems', layers: ['disease-incidences', 'treatment', 'crop-calendar'] },
+  { id: 'fm-8', personaId: 'farmer', role: 'Farmer', text: 'Share disease findings with other farmers in my community via WhatsApp', layers: ['disease-incidences'] },
+
+  // ── Crop Protection ──
+  { id: 'cp-1', personaId: 'crop-protection', role: 'Marketing Head', text: 'Plan marketing campaigns and field events, with 1–2 weeks heads up before disease spikes', layers: ['disease-incidences', 'growth-stage', 'demand-forecast'] },
+  { id: 'cp-2', personaId: 'crop-protection', role: 'Sales Head', text: 'Know how many bottles/liters to set as sales target per subdistrict', layers: ['acreage', 'farmer-value', 'treatment', 'demand-forecast'] },
+  { id: 'cp-3', personaId: 'crop-protection', role: 'Sales Head', text: 'Get an overview of what\'s happening on the ground right now', layers: ['disease-incidences', 'demand-forecast', 'growth-stage'] },
+  { id: 'cp-4', personaId: 'crop-protection', role: 'Field Agent', text: 'Know what to talk about with farmers — which diseases are active, which products to recommend', layers: ['disease-incidences', 'treatment'] },
+  { id: 'cp-5', personaId: 'crop-protection', role: 'CEO / CMO', text: 'Plan expansion into new regions, identify biggest TAM pockets', layers: ['acreage', 'farmer-value', 'treatment', 'sales-data'] },
+  { id: 'cp-6', personaId: 'crop-protection', role: 'Marketing Head', text: 'Know when seeds go in the ground and current crop stages (herbicide window timing)', layers: ['sowing-date', 'growth-stage'] },
+  { id: 'cp-7', personaId: 'crop-protection', role: 'Shopkeeper', text: 'Stay knowledgeable about spreading diseases and upcoming products', layers: ['disease-incidences', 'treatment'] },
+
+  // ── Seed ──
+  { id: 'sd-1', personaId: 'seed', role: 'Sales / Marketing Head', text: 'Know how much seed varieties to ship where — unsold stock becomes cow fodder', layers: ['acreage', 'sowing-date'] },
+  { id: 'sd-2', personaId: 'seed', role: 'Research / Breeding', text: 'Understand disease pattern trends and spot new emerging diseases', layers: ['disease-incidences', 'weather'] },
+  { id: 'sd-3', personaId: 'seed', role: 'Marketing Head', text: 'Know where which crops are planted and likely diseases for Q1/Q2 planning', layers: ['acreage', 'disease-incidences', 'sowing-date'] },
+
+  // ── Fertilizer ──
+  { id: 'fe-1', personaId: 'fertilizer', role: 'Sales Head', text: 'Get crop acreage and growth stage overview for TAM per subdistrict', layers: ['acreage', 'growth-stage', 'farmer-value'] },
+  { id: 'fe-2', personaId: 'fertilizer', role: 'CEO / CMO', text: 'Identify patterns of recurring nutrient deficiencies', layers: ['disease-incidences', 'acreage'] },
+  { id: 'fe-3', personaId: 'fertilizer', role: 'Marketing Head', text: 'Know crop stages for next fertilization period', layers: ['growth-stage', 'sowing-date'] },
+  { id: 'fe-4', personaId: 'fertilizer', role: 'Marketing Head', text: 'Know when plants have physical stress (bio-stimulant timing)', layers: ['weather', 'growth-stage'] },
+  { id: 'fe-5', personaId: 'fertilizer', role: 'Marketing Head', text: 'Understand soil patterns for micronutrients focus areas', layers: ['weather', 'acreage'] },
+  { id: 'fe-6', personaId: 'fertilizer', role: 'Marketing Head', text: 'Find high density vegetable crop areas (higher spend potential)', layers: ['acreage', 'farmer-value'] },
+  { id: 'fe-7', personaId: 'fertilizer', role: 'Marketing Head', text: 'Identify crop patterns for specialty product targeting', layers: ['acreage', 'growth-stage'] },
+
+  // ── Commodity ──
+  { id: 'co-1', personaId: 'commodity', role: 'Procurement Manager', text: 'Get mid-season yield forecasts at district level', layers: ['acreage', 'weather', 'growth-stage', 'disease-incidences'] },
+
+  // ── R&D (under Crop Protection) ──
+  { id: 'rd-1', personaId: 'crop-protection', role: 'R&D Researcher', text: 'Get real-time, field-level disease incidence data across multiple states to identify emerging threats and prioritize research', layers: ['disease-incidences'] },
+  { id: 'rd-2', personaId: 'crop-protection', role: 'R&D Team', text: 'Use disease forecasting models combining weather, historical data, and crop growth stage to anticipate outbreaks 1–2 weeks ahead', layers: ['disease-incidences', 'weather', 'growth-stage', 'demand-forecast'] },
+  { id: 'rd-3', personaId: 'crop-protection', role: 'R&D Scientist', text: 'Correlate disease pressure data with yield impact to validate product efficacy and build economic justification', layers: ['disease-incidences', 'acreage', 'farmer-treatment-behavior'] },
+  { id: 'rd-4', personaId: 'crop-protection', role: 'Product Development', text: 'Access farmer-submitted photo data to validate crop models, train AI, and improve product recommendations', layers: ['disease-incidences', 'growth-stage'] },
+  { id: 'rd-5', personaId: 'crop-protection', role: 'R&D Team', text: 'Use Plantix data for research beyond commercial support — testing formulations, understanding disease ecology, validating models', layers: ['disease-incidences', 'weather', 'growth-stage', 'treatment'] },
+  { id: 'rd-6', personaId: 'crop-protection', role: 'R&D Content Creator', text: 'Efficiently translate technical R&D knowledge into field-usable sales enablement content', layers: ['disease-incidences', 'treatment'] },
+  { id: 'rd-7', personaId: 'crop-protection', role: 'R&D Researcher', text: 'Integrate crop growth stage detection with disease data to understand optimal product application timing windows', layers: ['growth-stage', 'disease-incidences', 'treatment'] }
+];
+
+// ============================================================
+// DEFAULT DATA — LAYERS (with comprehensive tasks from Data Layers doc)
+// ============================================================
+const DEFAULT_LAYERS = [
+  {
+    id: 'disease-incidences', name: 'Disease Incidences', icon: '🦠',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Disease counts + thresholds + trends' },
+      { label: 'v1', status: 'planned', desc: 'Incorporate growth stage sensitivity and treatability' },
+      { label: 'v2', status: 'planned', desc: 'Predictive outbreak alerts' }
+    ],
+    notes: 'Core layer — feeds the most use cases. Need to go from incidences to pressure and actions. Dependent on detection model accuracy.',
+    tasks: [
+      { id: 'di-1', desc: 'Aggregate detections by district-crop-week', sources: ['plantix'], done: true, next: false, assignee: '' },
+      { id: 'di-2', desc: 'Normalize by user base to get incidence rate', sources: ['plantix', 'derived'], done: true, next: false, assignee: '' },
+      { id: 'di-3', desc: 'Add confidence intervals based on sample size', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'di-4', desc: 'Incorporate growth stage sensitivity on disease counts (v1)', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'di-5', desc: 'Add treatability layer on disease counts (v1)', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'di-6', desc: 'Build outbreak trend detection (v2)', sources: ['plantix', 'external'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'acreage', name: 'Acreage', icon: '🗺️',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'District-level from UPAG' },
+      { label: 'v1', status: 'done', desc: 'Sub-district via cropland coverage approximation' },
+      { label: 'v2', status: 'planned', desc: 'Satellite-validated + partnerships' }
+    ],
+    notes: 'v0-v1 done. Partnerships needed to go beyond — we have reached the 80/20 effort. Combines government data (UPAG) cross-referenced with NABARD district-level PDFs and ICRISAT.',
+    tasks: [
+      { id: 'ac-1', desc: 'Ingest UPAG historical crop acreage at district level', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'ac-2', desc: 'Cross-reference with NABARD district-level PDFs and ICRISAT', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'ac-3', desc: 'Approximate sub-district distribution using cropland coverage data', sources: ['external', 'derived'], done: true, next: false, assignee: '' },
+      { id: 'ac-4', desc: 'Correct cropland coverage data and load into BigQuery/Mosquito', sources: ['derived'], done: true, next: false, assignee: '' },
+      { id: 'ac-5', desc: 'Cross-validate acreage with seed sales volumes', sources: ['external'], done: false, next: false, assignee: '' },
+      { id: 'ac-6', desc: 'Collect farm size via in-app surveys (target: 1,000 farmers per district-crop-season)', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'ac-7', desc: 'Account for resistant/tolerant variety traits that eliminate acreage from TAM', sources: ['external', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'ac-8', desc: 'Add horticultural crop data', sources: ['external'], done: false, next: false, assignee: '' },
+      { id: 'ac-9', desc: 'Seasonal update pipeline', sources: ['external', 'derived'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'growth-stage', name: 'Growth Stage', icon: '🌾',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Average crop timelines from agronomy (GROW model stages)' },
+      { label: 'v1', status: 'in-progress', desc: 'Real-time growth stage detection from Plantix images' },
+      { label: 'v2', status: 'planned', desc: 'Add two more crops for growth stages' }
+    ],
+    notes: 'v0 timelines were optimized for notification timing (arrive before growth stage) while these relate to the stage itself. GROW labelling done for maize, cotton, soybean. Rice still WIP.',
+    tasks: [
+      { id: 'gs-1', desc: 'Define predefined crop timelines aligned with GROW model training stages', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'gs-2', desc: 'Complete GROW labelling for rice', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'gs-3', desc: 'Deploy growth stage models to replace static timelines with real-time estimation', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'gs-4', desc: 'Add two more crops for growth stage detection (v2)', sources: ['plantix'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'sowing-date', name: 'Sowing Date / Monsoon Onset', icon: '📅',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'IMD normal monsoon dates' },
+      { label: 'v1', status: 'planned', desc: 'IMD seasonal forecast (available April/May)' },
+      { label: 'v2', status: 'planned', desc: 'Farm-level precision from in-app data' }
+    ],
+    notes: 'Determines when the crop season starts, triggering the demand cycle. Farmers follow official prognoses.',
+    tasks: [
+      { id: 'sw-1', desc: 'Integrate IMD historical average monsoon dates', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'sw-2', desc: 'Incorporate IMD seasonal forecast to adjust for deviation from normal (v1)', sources: ['external'], done: false, next: false, assignee: '' },
+      { id: 'sw-3', desc: 'Compare historical monsoon onsets with growth stage data (trace back from seedling stage)', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'sw-4', desc: 'Collect actual sowing and harvest dates via in-app polls/surveys (target: 1,000 per district-crop-season)', sources: ['plantix'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'weather', name: 'Weather', icon: '🌦️',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'District-level daily weather' },
+      { label: 'v1', status: 'done', desc: '7-day forecasts integrated' },
+      { label: 'v2', status: 'planned', desc: 'Hyperlocal weather stations' }
+    ],
+    notes: 'Solid external data source. API pipeline stable.',
+    tasks: [
+      { id: 'wt-1', desc: 'Ingest daily weather data via API', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'wt-2', desc: 'Add 7-day forecast integration', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'wt-3', desc: 'Evaluate hyperlocal weather station partnerships', sources: ['external'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'farmer-value', name: 'Farmer Value / Input Costs', icon: '💰',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Average value per acre (done for fertiliser)' },
+      { label: 'v1', status: 'in-progress', desc: 'Move to volumes/quantity of technical sold' }
+    ],
+    notes: 'Acreage × value per acre = TAM in ₹. Fertiliser factors done for rice and maize. Pesticides: government data per state but no split by crop or type. Official prices may be up to 60% lower than actual market.',
+    tasks: [
+      { id: 'fv-1', desc: 'Build basic proxy: acreage × average input spend per acre', sources: ['derived'], done: true, next: false, assignee: '' },
+      { id: 'fv-2', desc: 'Finalize fertiliser factors (NPK) — state-level from government 2023-24', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'fv-3', desc: 'Map spending to specific technicals, dosages, and application patterns (v1)', sources: ['derived', 'external'], done: false, next: false, assignee: '' },
+      { id: 'fv-4', desc: 'Collect actual brands purchased and spending via in-app surveys', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'fv-5', desc: 'Add surveys a la Kynetec in the Plantix Farmer App', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'fv-6', desc: 'Look at expenses from the in-app calculators', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'fv-7', desc: 'Account for commodity price elasticity (Kharif 100% vs Rabi 40-60% willingness)', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'fv-8', desc: 'Account for supply chain accessibility — not all technicals reach all sub-districts', sources: ['external', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'fv-9', desc: 'Create farmer segments (small/medium/large)', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'treatment', name: 'Treatment Recommendations', icon: '💊',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Crop-disease susceptibility mapping + input mapping' },
+      { label: 'v1', status: 'in-progress', desc: 'Agreed factors for pesticide TAM model' },
+      { label: 'v2', status: 'planned', desc: 'Formulation-level splits + efficacy scoring' }
+    ],
+    notes: 'v0: mapping of top diseases by crop sensitivity plus treatment assumptions for MVP. v1 factors: application timing, dominant crop × pest, impact, regulatory scope. Must go beyond fungicide/insecticide to formulation/AI level.',
+    tasks: [
+      { id: 'tr-1', desc: 'Curate treatment database per disease-crop (susceptibility mapping)', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'tr-2', desc: 'Map input per stage (1 fertiliser + 1 herbicide)', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'tr-3', desc: 'Add regional product availability filtering', sources: ['external', 'plantix'], done: true, next: false, assignee: '' },
+      { id: 'tr-4', desc: 'Categorize application timing: seed treatment, soil application, foliar application (v1)', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'tr-5', desc: 'Add dominant crop × dominant pest/disease prevalence weighting (v1)', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'tr-6', desc: 'Add impact of pest/disease — most harmful = higher TAM (v1)', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'tr-7', desc: 'Add regulatory scope filtering — technical can only be sold for registered crops (v1)', sources: ['external'], done: false, next: false, assignee: '' },
+      { id: 'tr-8', desc: 'Build formulation/AI level splits (e.g. Imidacloprid 60% / Pymetrozine 30% / Dinotefuran 10%)', sources: ['external', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'tr-9', desc: 'Collect efficacy data from field feedback', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'tr-10', desc: 'Collect farmer segmentation data for generic vs. specialist split', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'tr-11', desc: 'Model retailer influence on product choice', sources: ['external', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'tr-12', desc: 'Assess target overlap displacement — broad-spectrum cannibalising specialist TAM', sources: ['derived'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'demand-forecast', name: 'Demand Forecast', icon: '📊',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Simple proportional estimate from Plantix image ratios' },
+      { label: 'v1', status: 'done', desc: 'Autoregressive + Bayesian disease risk index (3-month, top 5 diseases on rice/maize/cotton)' },
+      { label: 'v2', status: 'done', desc: 'Extended by growth stage sensitivity and treatability weighting' }
+    ],
+    notes: 'v0-v2 done. Demand = farmer using the product. Go backwards through supply chain (retailer → distributor → producer). All time steps are customer-adjustable; only farmer consumption is modelled. Open: full feedback loop for updating weekly forecast during season not yet defined.',
+    tasks: [
+      { id: 'df-1', desc: 'Build simple proportional estimate from Plantix image ratios (v0)', sources: ['plantix', 'derived'], done: true, next: false, assignee: '' },
+      { id: 'df-2', desc: 'Normalize disease counts by total volume over forecast window for density', sources: ['plantix', 'derived'], done: true, next: false, assignee: '' },
+      { id: 'df-3', desc: 'Build autoregressive + Bayesian model (monsoon-sensitive, sparse data)', sources: ['plantix', 'external', 'derived'], done: true, next: false, assignee: '' },
+      { id: 'df-4', desc: 'Weight pressure by crop susceptibility at current growth stage (v2)', sources: ['derived'], done: true, next: false, assignee: '' },
+      { id: 'df-5', desc: 'Use treatment window instead of disease treatability window for specific PPPs', sources: ['derived'], done: true, next: false, assignee: '' },
+      { id: 'df-6', desc: 'Define feedback loop for updating weekly forecast as in-season data comes in', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'df-7', desc: 'Translate biological factors from agronomy qualitative mapping into mathematical formula', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'df-8', desc: 'Build volume-based TAM: Acreage × Disease_Pressure × Treatment_Rate × Application_Rate', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'df-9', desc: 'Partner pilot for demand validation', sources: ['external'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'sales-data', name: 'Sales Data', icon: '🧾',
+    versions: [
+      { label: 'v0', status: 'planned', desc: 'Partner sales data ingestion' },
+      { label: 'v1', status: 'planned', desc: 'Normalized cross-partner view' },
+      { label: 'v2', status: 'planned', desc: 'Sales × detection correlation' }
+    ],
+    notes: 'Blocked on partner data sharing agreements. Critical for Farmer Value validation.',
+    tasks: [
+      { id: 'sd-t1', desc: 'Negotiate data sharing with 2+ partners', sources: ['external'], done: false, next: false, assignee: '' },
+      { id: 'sd-t2', desc: 'Build secure ingestion pipeline', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'sd-t3', desc: 'Normalize across different partner formats', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'sd-t4', desc: 'Validate with CropLife industry sales data (technical × state × crop)', sources: ['external'], done: false, next: false, assignee: '' },
+      { id: 'sd-t5', desc: 'Enable clients to share their own regional sales figures for calibration', sources: ['external', 'plantix'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'crop-calendar', name: 'Crop Calendar', icon: '📆',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Expert-curated calendars' },
+      { label: 'v1', status: 'done', desc: 'Region-specific adjustments' },
+      { label: 'v2', status: 'planned', desc: 'Dynamic calendar from detections' }
+    ],
+    notes: 'Stable foundation. Powers Growth Stage and Sowing Date layers.',
+    tasks: [
+      { id: 'cc-1', desc: 'Compile crop calendars from agricultural universities', sources: ['external'], done: true, next: false, assignee: '' },
+      { id: 'cc-2', desc: 'Adjust for regional climate variations', sources: ['external', 'derived'], done: true, next: false, assignee: '' },
+      { id: 'cc-3', desc: 'Auto-update from Plantix detection patterns', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' }
+    ]
+  },
+  {
+    id: 'farmer-treatment-behavior', name: 'Farmer Treatment Behavior', icon: '🧑‍🌾',
+    versions: [
+      { label: 'v0', status: 'done', desc: 'Uniform assumption — all diseases treated equally' },
+      { label: 'v1', status: 'in-progress', desc: 'Weight by damage score (1-5) per crop-disease' },
+      { label: 'v2', status: 'planned', desc: 'Plantix detection prevalence data per geography' }
+    ],
+    notes: 'Narrows TAM down to SOM — the share that reflects real purchasing behaviour. Not all farmers who face a treatable disease actually spray. Like pharma "treatment rate" — not all diagnosed patients get treated.',
+    tasks: [
+      { id: 'fb-1', desc: 'Baseline: uniform treatment assumption across all diseases', sources: ['derived'], done: true, next: false, assignee: '' },
+      { id: 'fb-2', desc: 'Weight by existing damage scores (1-5) for crop-disease combinations', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'fb-3', desc: 'Use % of Plantix images showing specific disease per geography as prevalence', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'fb-4', desc: 'Collect farmer-reported damage level and whether they treated or not', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'fb-5', desc: 'Collect product effectiveness outcomes via in-app surveys', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'fb-6', desc: 'Correlate with commodity prices — cross-validate with LDC back-testing (disease pressure vs yield impact for pulses)', sources: ['external', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'fb-7', desc: 'Collect actual yield data and harvest dates via in-app surveys', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'fb-8', desc: 'Collect treatment application timing via in-app surveys (week/growth stage)', sources: ['plantix'], done: false, next: false, assignee: '' },
+      { id: 'fb-9', desc: 'Model scouting gap — farmer detection lag affects curative vs preventative TAM', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'fb-10', desc: 'Model preventative spraying patterns (calendar-based or neighbour-driven)', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' },
+      { id: 'fb-11', desc: 'Account for leftover stock usage from previous seasons', sources: ['derived'], done: false, next: false, assignee: '' },
+      { id: 'fb-12', desc: 'Use Plantix popularity data as behavioral signal for farmer awareness/intent', sources: ['plantix', 'derived'], done: false, next: false, assignee: '' }
+    ]
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = loadState();
+let currentView = 'personas';
+let currentLevel = 1;
+let selectedPersona = null;
+let selectedLayer = null;
+let editingLayersForUc = null;
+let tagDropdownForUc = null;
+
+function getDefaultState() {
+  const ucs = JSON.parse(JSON.stringify(DEFAULT_USE_CASES));
+  ucs.forEach(uc => { if (!uc.tags) uc.tags = ['Sales']; });
+  return {
+    personas: JSON.parse(JSON.stringify(DEFAULT_PERSONAS)),
+    useCases: ucs,
+    layers: JSON.parse(JSON.stringify(DEFAULT_LAYERS)),
+    availableTags: ['Sales', 'UX', 'Internal'],
+    lastSaved: null
+  };
+}
+
+function loadState() {
+  if (BAKED_DATA) return JSON.parse(JSON.stringify(BAKED_DATA));
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.layers && parsed.useCases) {
+        // Migrate tasks: add 'next' and 'assignee' fields if missing
+        for (const l of parsed.layers) {
+          for (const t of l.tasks) {
+            if (t.next === undefined) t.next = false;
+            if (t.assignee === undefined) t.assignee = '';
+          }
+        }
+        // Migrate: add farmer persona if missing
+        if (!parsed.personas.find(p => p.id === 'farmer')) {
+          parsed.personas.unshift({ id: 'farmer', name: 'Farmer', icon: '👨‍🌾' });
+          DEFAULT_USE_CASES.filter(u => u.personaId === 'farmer').forEach(fc => {
+            if (!parsed.useCases.find(u => u.id === fc.id)) parsed.useCases.push(JSON.parse(JSON.stringify(fc)));
+          });
+        }
+        // Migrate: move any R&D stories from 'rnd' persona to 'crop-protection'
+        parsed.useCases.forEach(uc => { if (uc.personaId === 'rnd') uc.personaId = 'crop-protection'; });
+        // Remove rnd persona if it exists
+        parsed.personas = parsed.personas.filter(p => p.id !== 'rnd');
+        // Ensure R&D stories exist under crop-protection
+        DEFAULT_USE_CASES.filter(u => u.personaId === 'crop-protection' && u.id.startsWith('rd-')).forEach(fc => {
+          if (!parsed.useCases.find(u => u.id === fc.id)) parsed.useCases.push(JSON.parse(JSON.stringify(fc)));
+        });
+        // Migrate: add farmer-treatment-behavior layer if missing
+        if (!parsed.layers.find(l => l.id === 'farmer-treatment-behavior')) {
+          const ftb = DEFAULT_LAYERS.find(l => l.id === 'farmer-treatment-behavior');
+          if (ftb) parsed.layers.push(JSON.parse(JSON.stringify(ftb)));
+        }
+        // Migrate: add tags to use cases and availableTags to state
+        if (!parsed.availableTags) parsed.availableTags = ['Sales', 'UX', 'Internal'];
+        parsed.useCases.forEach(uc => { if (!uc.tags) uc.tags = ['Sales']; });
+        return parsed;
+      }
+    }
+  } catch(e) {}
+  return getDefaultState();
+}
+
+function saveState() {
+  state.lastSaved = new Date().toISOString();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateLastSaved();
+}
+
+function updateLastSaved() {
+  const el = document.getElementById('lastSaved');
+  if (state.lastSaved) {
+    el.textContent = 'Saved ' + new Date(state.lastSaved).toLocaleTimeString();
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigate(level, opts = {}) {
+  currentView = 'personas';
+  document.getElementById('nextUpBtn').classList.remove('active');
+  const content = document.getElementById('content');
+  content.classList.add('fading');
+  setTimeout(() => {
+    currentLevel = level;
+    if (opts.personaId !== undefined) selectedPersona = opts.personaId;
+    if (opts.layerId !== undefined) selectedLayer = opts.layerId;
+    renderBreadcrumbs();
+    renderContent();
+    renderSidebar();
+    content.classList.remove('fading');
+  }, 150);
+}
+
+function toggleNextUp() {
+  const btn = document.getElementById('nextUpBtn');
+  if (currentView === 'nextup') {
+    currentView = 'personas'; currentLevel = 1;
+    btn.classList.remove('active');
+  } else {
+    currentView = 'nextup';
+    btn.classList.add('active');
+  }
+  renderBreadcrumbs(); renderContent(); renderSidebar();
+}
+
+function renderBreadcrumbs() {
+  const bc = document.getElementById('breadcrumbs');
+  if (currentView === 'nextup') { bc.innerHTML = '<span class="current">Next Up</span>'; return; }
+  let html = '';
+  if (currentLevel === 1) {
+    html = '<span class="current">Personas</span>';
+  } else if (currentLevel === 2) {
+    const p = state.personas.find(p => p.id === selectedPersona);
+    html = `<a onclick="navigate(1)">Personas</a><span class="sep">›</span><span class="current">${p ? p.icon + ' ' + p.name : ''}</span>`;
+  } else if (currentLevel === 3) {
+    const p = state.personas.find(p => p.id === selectedPersona);
+    const l = state.layers.find(l => l.id === selectedLayer);
+    html = `<a onclick="navigate(1)">Personas</a><span class="sep">›</span>`;
+    if (selectedPersona) html += `<a onclick="navigate(2, {personaId:'${selectedPersona}'})">${p ? p.icon + ' ' + p.name : ''}</a><span class="sep">›</span>`;
+    html += `<span class="current">${l ? l.icon + ' ' + l.name : ''}</span>`;
+  }
+  bc.innerHTML = html;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderContent() {
+  const el = document.getElementById('content');
+  if (currentView === 'nextup') { renderNextUp(el); return; }
+  if (currentLevel === 1) renderLevel1(el);
+  else if (currentLevel === 2) renderLevel2(el);
+  else if (currentLevel === 3) renderLevel3(el);
+}
+
+function renderLevel1(el) {
+  let html = '<div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">';
+  for (const p of state.personas) {
+    const cases = state.useCases.filter(u => u.personaId === p.id);
+    const layerIds = [...new Set(cases.flatMap(u => u.layers))];
+    html += `<div class="card persona-card" onclick="navigate(2, {personaId:'${p.id}'})">
+      <div class="persona-icon">${p.icon}</div>
+      <div class="persona-name">${escHtml(p.name)}</div>
+      <div class="persona-count">${cases.length} user stor${cases.length === 1 ? 'y' : 'ies'}</div>
+      <div class="layer-count">${layerIds.length} data layers</div>
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderLevel2(el) {
+  const cases = state.useCases.filter(u => u.personaId === selectedPersona);
+  let html = '<div class="cards-grid">';
+  for (const uc of cases) {
+    const isEditing = editingLayersForUc === uc.id;
+    const ucTags = uc.tags || [];
+    const showDropdown = tagDropdownForUc === uc.id;
+    const availableToAdd = (state.availableTags || []).filter(t => !ucTags.includes(t));
+    html += `<div class="card usecase-card">
+      <div class="uc-tags">
+        ${ucTags.map(t => {
+          const safeTag = t.replace(/'/g, "\\'");
+          return `<span class="uc-tag">${escHtml(t)}<span class="tag-remove" onclick="removeTagFromUc('${uc.id}','${safeTag}')">&times;</span></span>`;
+        }).join('')}
+        <span class="add-tag-btn" onclick="toggleTagDropdown(event,'${uc.id}')">+ tag</span>
+        ${showDropdown ? `<div class="tag-dropdown">
+          ${availableToAdd.map(t => {
+            const safeTag = t.replace(/'/g, "\\'");
+            return `<div class="tag-dropdown-item" onmousedown="event.preventDefault();addTagToUc('${uc.id}','${safeTag}')">${escHtml(t)}</div>`;
+          }).join('')}
+          ${availableToAdd.length === 0 ? '<div style="padding:6px 10px;font-size:11px;color:#94a3b8;">All tags added</div>' : ''}
+          <div class="tag-dropdown-new">
+            <input type="text" id="newTag-${uc.id}" placeholder="New tag..." onkeydown="if(event.key==='Enter'){event.preventDefault();createAndAddTag('${uc.id}')}">
+            <button onmousedown="event.preventDefault();createAndAddTag('${uc.id}')">Add</button>
+          </div>
+        </div>` : ''}
+      </div>
+      <div class="role">${escHtml(uc.role)}</div>
+      <div class="story-text" contenteditable="true" onblur="updateStoryText('${uc.id}', this.textContent)">${escHtml(uc.text)}</div>
+      <div class="data-chips">
+        ${uc.layers.map(lid => {
+          const layer = state.layers.find(l => l.id === lid);
+          if (!layer) return '';
+          if (isEditing) {
+            return `<span class="data-chip" title="${layer.name}">${layer.icon} ${layer.name} <span class="chip-remove" onclick="removeLayerFromUc('${uc.id}','${lid}')">✕</span></span>`;
+          }
+          return `<span class="data-chip" onclick="navigate(3, {layerId:'${lid}'})" title="${layer.name}">${layer.icon} ${layer.name}</span>`;
+        }).join('')}
+        <span class="edit-layers-btn" onclick="toggleEditLayers('${uc.id}')">${isEditing ? 'Done' : '✎'}</span>
+      </div>
+      ${isEditing ? `<div class="layer-picker">
+        ${state.layers.filter(l => !uc.layers.includes(l.id)).map(l =>
+          `<span class="layer-pick" onclick="addLayerToUc('${uc.id}','${l.id}')">${l.icon} ${l.name}</span>`
+        ).join('')}
+      </div>` : ''}
+    </div>`;
+  }
+  html += '</div>';
+  html += `<button class="add-btn" onclick="showAddUseCaseModal()">+ Add user story</button>`;
+  el.innerHTML = html;
+}
+
+function renderLevel3(el) {
+  const layer = state.layers.find(l => l.id === selectedLayer);
+  if (!layer) { el.innerHTML = '<p>Layer not found.</p>'; return; }
+
+  const reverseLinks = {};
+  for (const uc of state.useCases) {
+    if (uc.layers.includes(layer.id)) {
+      const p = state.personas.find(p => p.id === uc.personaId);
+      if (!reverseLinks[uc.personaId]) reverseLinks[uc.personaId] = { persona: p, cases: [] };
+      reverseLinks[uc.personaId].cases.push(uc);
+    }
+  }
+  const totalPersonas = Object.keys(reverseLinks).length;
+  const totalCases = Object.values(reverseLinks).reduce((s, g) => s + g.cases.length, 0);
+
+  let html = `<div class="layer-detail">
+    <div class="layer-header">
+      <span class="layer-icon">${layer.icon}</span>
+      <span class="layer-name">${escHtml(layer.name)}</span>
+    </div>
+    <div class="section-title">Notes</div>
+    <textarea class="notes-area" onblur="updateLayerNotes('${layer.id}', this.value)">${escHtml(layer.notes || '')}</textarea>
+    <div class="section-title">Where is this used? — ${totalPersonas} persona${totalPersonas !== 1 ? 's' : ''}, ${totalCases} use case${totalCases !== 1 ? 's' : ''}</div>
+    <div class="reverse-links">
+      ${Object.values(reverseLinks).map(g => `
+        <div class="reverse-link-group">
+          <div class="reverse-link-persona">${g.persona.icon} ${escHtml(g.persona.name)}</div>
+          ${g.cases.map(uc => `<div class="reverse-link-item" onclick="navigate(2, {personaId:'${uc.personaId}'})">${escHtml(uc.role)}: ${escHtml(truncate(uc.text, 80))}</div>`).join('')}
+        </div>
+      `).join('')}
+    </div>
+    <div class="section-title">Tasks</div>
+    <div class="task-list">
+      ${layer.tasks.map((t, i) => renderTask(layer.id, t, i)).join('')}
+    </div>
+    <button class="add-btn" onclick="addTask('${layer.id}')">+ Add task</button>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function renderTask(layerId, task, idx) {
+  return `<div class="task-item ${task.next ? 'is-next' : ''}">
+    <div class="task-checkbox ${task.done ? 'checked' : ''}" onclick="toggleTask('${layerId}', ${idx})"></div>
+    <div class="task-content">
+      <div class="task-desc" contenteditable="true"
+           onblur="updateTaskDesc('${layerId}', ${idx}, this.textContent)"
+           style="${task.done ? 'text-decoration: line-through; color: #94a3b8;' : ''}">${escHtml(task.desc)}</div>
+      <div class="task-meta">
+        ${renderSourcePill(layerId, idx, 'plantix', '🌱 Plantix', task.sources)}
+        ${renderSourcePill(layerId, idx, 'external', '🌍 External', task.sources)}
+        ${renderSourcePill(layerId, idx, 'derived', '🔧 Derived', task.sources)}
+        <span class="next-toggle ${task.next ? 'active' : ''}" onclick="toggleNext('${layerId}', ${idx})">Next</span>
+      </div>
+      <div style="margin-top:6px;">
+        <input class="assignee-input" type="text" placeholder="Assignee — who's on this?"
+               value="${escHtml(task.assignee || '')}"
+               onchange="updateAssignee('${layerId}', ${idx}, this.value)">
+      </div>
+    </div>
+    <div class="task-actions">
+      <button class="task-delete" onclick="deleteTask('${layerId}', ${idx})" title="Delete task">✕</button>
+    </div>
+  </div>`;
+}
+
+function renderSourcePill(layerId, idx, source, label, sources) {
+  const active = sources.includes(source);
+  return `<span class="source-pill ${source} ${active ? '' : 'inactive'}"
+               onclick="toggleSource('${layerId}', ${idx}, '${source}')">${label}</span>`;
+}
+
+// ============================================================
+// NEXT UP VIEW
+// ============================================================
+function renderNextUp(el) {
+  const groups = [];
+  let totalNext = 0;
+  for (const layer of state.layers) {
+    const nextTasks = [];
+    layer.tasks.forEach((t, i) => {
+      if (t.next && !t.done) { nextTasks.push({ task: t, idx: i }); totalNext++; }
+    });
+    if (nextTasks.length > 0) groups.push({ layer, tasks: nextTasks });
+  }
+
+  let html = `<div class="next-up-header">
+    <h2>Next Up</h2>
+    <span class="count">${totalNext} task${totalNext !== 1 ? 's' : ''}</span>
+  </div>`;
+
+  if (groups.length === 0) {
+    html += `<div class="next-up-empty">
+      <p>No tasks marked as Next yet.</p>
+      <div class="hint">Open any data layer and click the "Next" button on tasks you want to work on.</div>
+    </div>`;
+  } else {
+    for (const g of groups) {
+      html += `<div class="next-up-group">
+        <div class="next-up-group-title">
+          ${g.layer.icon} ${escHtml(g.layer.name)}
+          <span class="layer-link" onclick="navigate(3, {layerId:'${g.layer.id}'})">View layer →</span>
+        </div>
+        <div class="task-list">
+          ${g.tasks.map(({ task, idx }) => renderTask(g.layer.id, task, idx)).join('')}
+        </div>
+      </div>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+function printNextUp() {
+  // Switch to Next Up view if not already there
+  if (currentView !== 'nextup') {
+    currentView = 'nextup';
+    document.getElementById('nextUpBtn').classList.add('active');
+    renderBreadcrumbs();
+    renderContent();
+    renderSidebar();
+  }
+  // Small delay to let render finish, then trigger print
+  setTimeout(() => window.print(), 200);
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '<div class="sidebar-title">Data Layers</div>';
+  const sortedLayers = [...state.layers].sort((a, b) => {
+    const countA = state.useCases.filter(u => u.layers.includes(a.id)).length;
+    const countB = state.useCases.filter(u => u.layers.includes(b.id)).length;
+    return countB - countA;
+  });
+  for (const layer of sortedLayers) {
+    const isActive = currentLevel === 3 && selectedLayer === layer.id && currentView !== 'nextup';
+    const nextCount = layer.tasks.filter(t => t.next && !t.done).length;
+    const ucCount = state.useCases.filter(u => u.layers.includes(layer.id)).length;
+    html += `<div class="sidebar-layer ${isActive ? 'active' : ''}" onclick="navigate(3, {layerId:'${layer.id}'})">
+      <span class="icon">${layer.icon}</span>
+      <span class="name">${layer.name} <span style="color:#94a3b8;font-weight:400;">(${ucCount})</span></span>
+      ${nextCount > 0 ? `<span style="font-size:10px;font-weight:700;color:#2563eb;background:#eff6ff;padding:1px 6px;border-radius:4px;">${nextCount}</span>` : ''}
+    </div>`;
+  }
+  html += `<button class="add-btn" style="width:100%;margin-top:12px;justify-content:center;" onclick="showAddLayerModal()">+ New Layer</button>`;
+  sb.innerHTML = html;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function updateStoryText(ucId, text) {
+  const uc = state.useCases.find(u => u.id === ucId);
+  if (uc && text.trim() && uc.text !== text.trim()) { uc.text = text.trim(); saveState(); }
+}
+
+function updateLayerNotes(layerId, text) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer) { layer.notes = text; saveState(); }
+}
+
+function toggleTask(layerId, idx) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.tasks[idx]) {
+    layer.tasks[idx].done = !layer.tasks[idx].done;
+    if (layer.tasks[idx].done) layer.tasks[idx].next = false;
+    saveState(); renderContent(); renderSidebar();
+  }
+}
+
+function toggleNext(layerId, idx) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.tasks[idx]) {
+    layer.tasks[idx].next = !layer.tasks[idx].next;
+    saveState(); renderContent(); renderSidebar();
+  }
+}
+
+function updateTaskDesc(layerId, idx, text) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.tasks[idx] && text.trim()) { layer.tasks[idx].desc = text.trim(); saveState(); }
+}
+
+function updateAssignee(layerId, idx, name) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.tasks[idx]) { layer.tasks[idx].assignee = name.trim(); saveState(); }
+}
+
+function toggleSource(layerId, idx, source) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (!layer || !layer.tasks[idx]) return;
+  const t = layer.tasks[idx];
+  const i = t.sources.indexOf(source);
+  if (i >= 0) { if (t.sources.length > 1) t.sources.splice(i, 1); }
+  else t.sources.push(source);
+  saveState(); renderContent();
+}
+
+function deleteTask(layerId, idx) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer) { layer.tasks.splice(idx, 1); saveState(); renderContent(); renderSidebar(); }
+}
+
+function addTask(layerId) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer) {
+    layer.tasks.push({ id: 't' + Date.now(), desc: 'New task', sources: ['plantix'], done: false, next: false, assignee: '' });
+    saveState(); renderContent();
+  }
+}
+
+// ============================================================
+// ADD USE CASE MODAL
+// ============================================================
+function showAddUseCaseModal() {
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <h3>Add User Story</h3>
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Role</label>
+    <input type="text" id="newRole" placeholder="e.g. Marketing Head" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Story</label>
+    <textarea id="newStory" placeholder="What does this person need?"></textarea>
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;margin-top:12px;">Data Layers</label>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+      ${state.layers.map(l => `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+        <input type="checkbox" value="${l.id}" class="new-uc-layer"> ${l.icon} ${l.name}
+      </label>`).join('')}
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveNewUseCase()">Add</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function saveNewUseCase() {
+  const role = document.getElementById('newRole').value.trim();
+  const story = document.getElementById('newStory').value.trim();
+  const layers = Array.from(document.querySelectorAll('.new-uc-layer:checked')).map(cb => cb.value);
+  if (!role || !story) return;
+  state.useCases.push({ id: 'uc-' + Date.now(), personaId: selectedPersona, role, text: story, layers });
+  saveState(); closeModal(); renderContent();
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('visible'); }
+
+// ============================================================
+// EDIT LAYERS ON USE CASES
+// ============================================================
+function toggleEditLayers(ucId) {
+  editingLayersForUc = editingLayersForUc === ucId ? null : ucId;
+  renderContent();
+}
+
+function addLayerToUc(ucId, layerId) {
+  const uc = state.useCases.find(u => u.id === ucId);
+  if (uc && !uc.layers.includes(layerId)) {
+    uc.layers.push(layerId);
+    saveState(); renderContent();
+  }
+}
+
+function removeLayerFromUc(ucId, layerId) {
+  const uc = state.useCases.find(u => u.id === ucId);
+  if (uc) {
+    uc.layers = uc.layers.filter(l => l !== layerId);
+    saveState(); renderContent();
+  }
+}
+
+// ============================================================
+// USE CASE TAGS
+// ============================================================
+function toggleTagDropdown(event, ucId) {
+  event.stopPropagation();
+  tagDropdownForUc = tagDropdownForUc === ucId ? null : ucId;
+  renderContent();
+}
+
+function addTagToUc(ucId, tag) {
+  const uc = state.useCases.find(u => u.id === ucId);
+  if (uc) {
+    if (!uc.tags) uc.tags = [];
+    if (!uc.tags.includes(tag)) uc.tags.push(tag);
+    tagDropdownForUc = null;
+    saveState(); renderContent();
+  }
+}
+
+function removeTagFromUc(ucId, tag) {
+  const uc = state.useCases.find(u => u.id === ucId);
+  if (uc && uc.tags) {
+    uc.tags = uc.tags.filter(t => t !== tag);
+    saveState(); renderContent();
+  }
+}
+
+function createAndAddTag(ucId) {
+  const input = document.getElementById('newTag-' + ucId);
+  if (!input) return;
+  const tag = input.value.trim();
+  if (!tag) return;
+  if (!state.availableTags) state.availableTags = [];
+  if (!state.availableTags.includes(tag)) state.availableTags.push(tag);
+  addTagToUc(ucId, tag);
+}
+
+// ============================================================
+// ADD NEW DATA LAYER
+// ============================================================
+function showAddLayerModal() {
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <h3>Add Data Layer</h3>
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Name</label>
+    <input type="text" id="newLayerName" placeholder="e.g. Yield Forecast" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Icon (emoji)</label>
+    <input type="text" id="newLayerIcon" placeholder="e.g. 📈" style="width:80px;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Notes (optional)</label>
+    <textarea id="newLayerNotes" placeholder="What is this layer about?"></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveNewLayer()">Add</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function saveNewLayer() {
+  const name = document.getElementById('newLayerName').value.trim();
+  const icon = document.getElementById('newLayerIcon').value.trim() || '📄';
+  const notes = document.getElementById('newLayerNotes').value.trim();
+  if (!name) return;
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  if (state.layers.find(l => l.id === id)) { alert('A layer with a similar name already exists.'); return; }
+  state.layers.push({
+    id, name, icon,
+    notes: notes,
+    tasks: []
+  });
+  saveState(); closeModal(); renderSidebar();
+  navigate(3, { layerId: id });
+}
+
+// ============================================================
+// EXPORT / IMPORT / RESET
+// ============================================================
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'plantix-dlw-export.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.personas && imported.layers && imported.useCases) {
+        state = imported; saveState(); navigate(1);
+      } else { alert('Invalid file format.'); }
+    } catch(err) { alert('Error reading file: ' + err.message); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetData() {
+  if (confirm('Reset all data to defaults? This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    state = getDefaultState();
+    saveState(); navigate(1);
+  }
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function truncate(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
+
+// ============================================================
+// INIT
+// ============================================================
+if (IS_READONLY) {
+  document.body.classList.add('readonly');
+  // In readonly mode, disable contenteditable on all elements
+  const observer = new MutationObserver(() => {
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      el.contentEditable = 'false';
+    });
+  });
+  observer.observe(document.getElementById('content'), { childList: true, subtree: true });
+}
+updateLastSaved();
+renderBreadcrumbs();
+renderContent();
+renderSidebar();
+document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.addEventListener('click', function(e) {
+  if (tagDropdownForUc && !e.target.closest('.tag-dropdown') && !e.target.closest('.add-tag-btn')) {
+    tagDropdownForUc = null; renderContent();
+  }
+});
+</script>
+</body>
+</html>
