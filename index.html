@@ -380,7 +380,1283 @@ body.readonly .top-bar-right { gap: 8px; }
 <script>
 const STORAGE_KEY = 'plantix-dlw-v5';
 const IS_READONLY = new URLSearchParams(window.location.search).get('mode') !== 'edit';
-const BAKED_DATA = {"personas": [{"id": "farmer", "name": "Farmer", "icon": "👨‍🌾"}, {"id": "crop-protection", "name": "Crop Protection (+Herbicides) Company", "icon": "🛡️"}, {"id": "seed", "name": "Seed Companies", "icon": "🌱"}, {"id": "fertilizer", "name": "Fertilizer / Bio-Stimulant Companies", "icon": "🌿"}, {"id": "commodity", "name": "Commodity Traders / Food Processors", "icon": "📦"}], "useCases": [{"id": "cp-1", "personaId": "crop-protection", "role": "Marketing Head", "text": "Plan marketing campaigns and field events, with 1–2 weeks heads up before disease spikes", "layers": ["disease-incidences", "growth-stage", "demand-forecast", "farmer-treatment-behavior"], "tags": ["Sales"]}, {"id": "cp-2", "personaId": "crop-protection", "role": "Sales Head", "text": "Know how many bottles/liters to set as sales target per subdistrict", "layers": ["acreage", "farmer-value", "treatment", "demand-forecast", "sales-data"], "tags": ["Sales"]}, {"id": "cp-3", "personaId": "crop-protection", "role": "Sales Head", "text": "Get an overview of what's happening on the ground right now", "layers": ["disease-incidences", "demand-forecast", "growth-stage", "farmer-treatment-behavior"], "tags": ["Sales"]}, {"id": "cp-4", "personaId": "crop-protection", "role": "Field Agent", "text": "Know what to talk about with farmers — which diseases are active, which products to recommend", "layers": ["disease-incidences", "treatment"], "tags": ["Sales"]}, {"id": "cp-5", "personaId": "crop-protection", "role": "CEO / CMO", "text": "Plan expansion into new regions, identify biggest TAM pockets", "layers": ["acreage", "farmer-value", "treatment", "sales-data"], "tags": ["Sales"]}, {"id": "cp-6", "personaId": "crop-protection", "role": "Marketing Head", "text": "Know when seeds go in the ground and current crop stages (herbicide window timing)", "layers": ["sowing-date", "growth-stage"], "tags": ["Sales"]}, {"id": "cp-7", "personaId": "crop-protection", "role": "Shopkeeper", "text": "Stay knowledgeable about spreading diseases and upcoming products", "layers": ["disease-incidences", "treatment"], "tags": ["Sales"]}, {"id": "sd-1", "personaId": "seed", "role": "Sales / Marketing Head", "text": "Know how much seed varieties to ship where — unsold stock becomes cow fodder", "layers": ["acreage", "sowing-date"], "tags": ["Sales"]}, {"id": "sd-2", "personaId": "seed", "role": "Research / Breeding", "text": "Understand disease pattern trends and spot new emerging diseases", "layers": ["disease-incidences", "weather"], "tags": ["Sales"]}, {"id": "sd-3", "personaId": "seed", "role": "Marketing Head", "text": "Know where which crops are planted and likely diseases for Q1/Q2 planning", "layers": ["acreage", "disease-incidences", "sowing-date"], "tags": ["Sales"]}, {"id": "fe-1", "personaId": "fertilizer", "role": "Sales Head", "text": "Get crop acreage and growth stage overview for TAM per subdistrict", "layers": ["acreage", "growth-stage", "farmer-value"], "tags": ["Sales"]}, {"id": "fe-2", "personaId": "fertilizer", "role": "CEO / CMO", "text": "Identify patterns of recurring nutrient deficiencies", "layers": ["disease-incidences", "acreage"], "tags": ["Sales"]}, {"id": "fe-3", "personaId": "fertilizer", "role": "Marketing Head", "text": "Know crop stages for next fertilization period", "layers": ["growth-stage", "sowing-date"], "tags": ["Sales"]}, {"id": "fe-4", "personaId": "fertilizer", "role": "Marketing Head", "text": "Know when plants have physical stress (bio-stimulant timing)", "layers": ["weather", "growth-stage"], "tags": ["Sales"]}, {"id": "fe-5", "personaId": "fertilizer", "role": "Marketing Head", "text": "Understand soil patterns for micronutrients focus areas", "layers": ["weather", "acreage"], "tags": ["Sales"]}, {"id": "fe-6", "personaId": "fertilizer", "role": "Marketing Head", "text": "Find high density vegetable crop areas (higher spend potential)", "layers": ["acreage", "farmer-value"], "tags": ["Sales"]}, {"id": "fe-7", "personaId": "fertilizer", "role": "Marketing Head", "text": "Identify crop patterns for specialty product targeting", "layers": ["acreage", "growth-stage"], "tags": ["Sales"]}, {"id": "co-1", "personaId": "commodity", "role": "Procurement Manager", "text": "Get mid-season yield forecasts at district level", "layers": ["acreage", "weather", "growth-stage", "disease-incidences"], "tags": ["Sales"]}, {"id": "fm-1", "personaId": "farmer", "role": "Farmer", "text": "Diagnose what disease or pest is affecting my crop from a photo", "layers": ["disease-incidences", "treatment"], "tags": ["Sales"]}, {"id": "fm-2", "personaId": "farmer", "role": "Farmer", "text": "Get the right treatment recommendation and product dosage for my field size", "layers": ["treatment", "acreage"], "tags": ["Sales"]}, {"id": "fm-3", "personaId": "farmer", "role": "Farmer", "text": "Know what growth stage my crop is in and what to do next", "layers": ["growth-stage", "crop-calendar"], "tags": ["Sales"]}, {"id": "fm-4", "personaId": "farmer", "role": "Farmer", "text": "Get timely alerts about disease outbreaks spreading in my area", "layers": ["disease-incidences", "weather"], "tags": ["Sales"]}, {"id": "fm-5", "personaId": "farmer", "role": "Farmer", "text": "Know the best sowing window for my crop and region", "layers": ["sowing-date", "crop-calendar", "weather"], "tags": ["Sales"]}, {"id": "fm-6", "personaId": "farmer", "role": "Farmer", "text": "Understand weather impact on my crop and plan accordingly", "layers": ["weather", "growth-stage"], "tags": ["Sales"]}, {"id": "fm-7", "personaId": "farmer", "role": "Farmer", "text": "Learn from short educational videos and tips about my specific crop problems", "layers": ["disease-incidences", "treatment", "crop-calendar"], "tags": ["Sales"]}, {"id": "fm-8", "personaId": "farmer", "role": "Farmer", "text": "Share disease findings with other farmers in my community via WhatsApp", "layers": ["disease-incidences"], "tags": ["Sales"]}, {"id": "rd-1", "personaId": "crop-protection", "role": "R&D Researcher", "text": "Get real-time, field-level disease incidence data across multiple states to identify emerging threats and prioritize research", "layers": ["disease-incidences"], "tags": ["Sales"]}, {"id": "rd-2", "personaId": "crop-protection", "role": "R&D Team", "text": "Use disease forecasting models combining weather, historical data, and crop growth stage to anticipate outbreaks 1–2 weeks ahead", "layers": ["disease-incidences", "weather", "growth-stage", "demand-forecast"], "tags": ["Sales"]}, {"id": "rd-3", "personaId": "crop-protection", "role": "R&D Scientist", "text": "Correlate disease pressure data with yield impact to validate product efficacy and build economic justification", "layers": ["disease-incidences", "acreage", "farmer-treatment-behavior"], "tags": ["Sales"]}, {"id": "rd-4", "personaId": "crop-protection", "role": "Product Development", "text": "Access farmer-submitted photo data to validate crop models, train AI, and improve product recommendations", "layers": ["disease-incidences", "growth-stage"], "tags": ["Sales"]}, {"id": "rd-5", "personaId": "crop-protection", "role": "R&D Team", "text": "Use Plantix data for research beyond commercial support — testing formulations, understanding disease ecology, validating models", "layers": ["disease-incidences", "weather", "growth-stage", "treatment"], "tags": ["Sales"]}, {"id": "rd-6", "personaId": "crop-protection", "role": "R&D Content Creator", "text": "Efficiently translate technical R&D knowledge into field-usable sales enablement content", "layers": ["disease-incidences", "treatment"], "tags": ["Sales"]}, {"id": "rd-7", "personaId": "crop-protection", "role": "R&D Researcher", "text": "Integrate crop growth stage detection with disease data to understand optimal product application timing windows", "layers": ["growth-stage", "disease-incidences", "treatment"], "tags": ["Sales"]}, {"id": "uc-1773914371090", "personaId": "seed", "role": "Sales Head", "text": "As a sales head at a seed company, I want to see SRR by crop and region, so that I can identify untapped markets where farmers need seed treatment and direct my sales team accordingly.", "layers": ["acreage", "growth-stage", "sowing-date"]}], "layers": [{"id": "disease-incidences", "name": "Disease Incidences", "icon": "🦠", "status": "green", "versions": [{"label": "v0", "status": "done", "desc": "Raw detection counts per crop-district"}, {"label": "v1", "status": "in-progress", "desc": "Normalized incidence rates with confidence"}, {"label": "v2", "status": "planned", "desc": "Predictive outbreak alerts"}], "notes": "Core layer — feeds the most use cases. Dependent on detection model accuracy.", "tasks": [{"id": "t1", "desc": "Aggregate detections by district-crop-week", "sources": ["plantix"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t2", "desc": "Normalize by user base to get incidence rate", "sources": ["plantix", "derived"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t1773827453109", "desc": "For maize,rice - add the angle of prevention /curative", "sources": ["plantix"], "done": false, "next": true, "assignee": "Agronomy"}, {"id": "t1773827489643", "desc": "For cotton, soybean - mapping  growth stage //sensitivity // treatbility // prevention-curation (for highest impact crop/diseases)", "sources": ["plantix"], "done": false, "next": true, "assignee": "Andjela"}]}, {"id": "acreage", "name": "Acreage", "icon": "🗺️", "status": "orange", "versions": [{"label": "v0", "status": "done", "desc": "Government statistics baseline"}, {"label": "v1", "status": "in-progress", "desc": "Satellite-validated estimates"}, {"label": "v2", "status": "planned", "desc": "Subdistrict-level granularity"}], "notes": "Combines government data with satellite validation. Key gap: subdistrict granularity. We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)", "tasks": [{"id": "t5", "desc": "Ingest government crop statistics (state/district)", "sources": ["external"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t6", "desc": "Validate with satellite imagery (NDVI-based)", "sources": ["external"], "done": false, "priority": "high", "next": false, "assignee": ""}, {"id": "t7", "desc": "Downscale to subdistrict using cropland data", "sources": ["plantix", "derived"], "done": true, "priority": "medium", "next": false, "assignee": ""}, {"id": "t8", "desc": "Seasonal update pipeline", "sources": ["external", "derived"], "done": false, "priority": "medium", "next": false, "assignee": ""}, {"id": "t1773826607058", "desc": "Include horticultural data and incorporate datachecks to understand the completenes/validity of the data (start with top crops)", "sources": ["external"], "done": false, "next": true, "assignee": "Yiannis & Sunil"}, {"id": "t1773827056735", "desc": "Ask farmers to import their sowing date and the crop they are planning to sow (this can help us on the deltas from season to season)", "sources": ["plantix"], "done": false, "next": true, "assignee": "Plantix App"}]}, {"id": "growth-stage", "name": "Growth Stage", "icon": "🌾", "status": "orange", "versions": [{"label": "v0", "status": "done", "desc": "Calendar-based estimates"}, {"label": "v1", "status": "in-progress", "desc": "Detection-derived growth stages"}, {"label": "v2", "status": "planned", "desc": "GDD-model integration"}], "notes": "Currently calendar-based. Photo-based detection being validated.", "tasks": [{"id": "t9", "desc": "Define growth stage calendar per crop-region", "sources": ["external", "derived"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t1773827267292", "desc": "Add crop timeline indicators for the crops soybean and cotton", "sources": ["plantix"], "done": false, "next": true, "assignee": "Andjela/Agronomy"}, {"id": "t1773829263090", "desc": "Add growth stage for horticultural crops (tomato, potato, onion, chilli)", "sources": ["plantix"], "done": false, "next": true, "assignee": "Andjela to discuss with Thomas"}]}, {"id": "sowing-date", "name": "Sowing Date", "icon": "📅", "status": "green", "versions": [{"label": "v0", "status": "done", "desc": "Historical calendar windows"}, {"label": "v1", "status": "done", "desc": "Detection-spike-based estimation"}, {"label": "v2", "status": "planned", "desc": "Farm-level precision"}], "notes": "Good coverage via detection spike analysis. v1 validated for major crops.", "tasks": [{"id": "t12", "desc": "Establish sowing windows from historical data", "sources": ["external"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t13", "desc": "Detect sowing date from first-detection spikes", "sources": ["plantix", "derived"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t14", "desc": "Validate against ground truth surveys", "sources": ["external"], "done": false, "priority": "medium", "next": false, "assignee": ""}]}, {"id": "weather", "name": "Weather", "icon": "🌦️", "status": "green", "versions": [{"label": "v0", "status": "done", "desc": "District-level daily weather"}, {"label": "v1", "status": "done", "desc": "7-day forecasts integrated"}, {"label": "v2", "status": "planned", "desc": "Hyperlocal weather stations"}], "notes": "Solid external data source. API pipeline stable.", "tasks": [{"id": "t15", "desc": "Ingest daily weather data via API", "sources": ["external"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t16", "desc": "Add 7-day forecast integration", "sources": ["external"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t17", "desc": "Evaluate hyperlocal weather station partnerships", "sources": ["external"], "done": false, "priority": "low", "next": false, "assignee": ""}]}, {"id": "farmer-value", "name": "Farmer Value", "icon": "💰", "status": "orange", "versions": [{"label": "v0", "status": "done", "desc": "Proxy from acreage × avg spend"}, {"label": "v1", "status": "in-progress", "desc": "Segment-level value tiers"}, {"label": "v2", "status": "planned", "desc": "Individual farmer scoring"}], "notes": "Currently a derived proxy. Needs sales data integration for validation.", "tasks": [{"id": "t18", "desc": "Build basic proxy: acreage × average input spend", "sources": ["derived"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t1773827142125", "desc": "Analyse the expenses imported in the calculators in the plantix farmer app - are we able to understand the split between CP/Fertiliser/Herbicides and see any groupings with crop and/or state level?", "sources": ["plantix"], "done": false, "next": true, "assignee": "Yiannis"}]}, {"id": "treatment", "name": "Treatment Recommendations", "icon": "💊", "status": "green", "versions": [{"label": "v0", "status": "done", "desc": "Static recommendation database"}, {"label": "v1", "status": "done", "desc": "Region-aware recommendations"}, {"label": "v2", "status": "planned", "desc": "Efficacy-scored recommendations"}], "notes": "Well-established. v2 needs field trial data.", "tasks": [{"id": "t21", "desc": "Curate treatment database per disease-crop", "sources": ["external"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t22", "desc": "Add regional product availability filtering", "sources": ["external", "plantix"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t1773827682850", "desc": "How do we map now the technicals companies to crop/diseases and dosages? Can we explore ways to add automation in the process? (rob vibe coded something) - focus on labeled claims", "sources": ["plantix"], "done": false, "next": true, "assignee": "Yiannis & Celine"}]}, {"id": "demand-forecast", "name": "Demand Forecast", "icon": "📊", "status": "red", "versions": [{"label": "v0", "status": "in-progress", "desc": "Rule-based demand signals"}, {"label": "v1", "status": "planned", "desc": "ML-based demand prediction"}, {"label": "v2", "status": "planned", "desc": "Real-time demand dashboard"}], "notes": "Earliest stage. Depends on Disease Incidences + Acreage + Growth Stage being solid.", "tasks": [{"id": "t24", "desc": "Define demand signal rules (disease spike → product need)", "sources": ["derived"], "done": false, "priority": "high", "next": false, "assignee": ""}, {"id": "t25", "desc": "Build demand estimation model", "sources": ["derived", "plantix"], "done": false, "priority": "high", "next": false, "assignee": ""}, {"id": "t26", "desc": "Partner pilot for demand validation", "sources": ["external"], "done": false, "priority": "medium", "next": false, "assignee": ""}]}, {"id": "sales-data", "name": "Sales Data", "icon": "🧾", "status": "red", "versions": [{"label": "v0", "status": "planned", "desc": "Partner sales data ingestion"}, {"label": "v1", "status": "planned", "desc": "Normalized cross-partner view"}, {"label": "v2", "status": "planned", "desc": "Sales × detection correlation"}], "notes": "Blocked on partner data sharing agreements. Critical for Farmer Value validation.", "tasks": [{"id": "t27", "desc": "CropLife industry sales data: Old 2018 report available by technical × state × crop (INR values plus avg price and quantity at country level); volume-based reports also exist. Newer reports being explored. If Croplife is not possible to look at alternatives", "sources": ["external"], "done": false, "priority": "high", "next": true, "assignee": "Sunil"}, {"id": "t1773826920156", "desc": "Retailer sales data", "sources": ["external"], "done": false, "next": true, "assignee": "Sunil"}, {"id": "t1773830873646", "desc": "Derive the number of treatable acres (acreage x disease x growth stage x treatiblity) - for maize", "sources": ["derived"], "done": false, "next": true, "assignee": "Yiannis"}]}, {"id": "crop-calendar", "name": "Crop Calendar", "icon": "📆", "status": "green", "versions": [{"label": "v0", "status": "done", "desc": "Expert-curated calendars"}, {"label": "v1", "status": "done", "desc": "Region-specific adjustments"}, {"label": "v2", "status": "planned", "desc": "Dynamic calendar from detections"}], "notes": "Stable foundation. Powers Growth Stage and Sowing Date layers.", "tasks": [{"id": "t30", "desc": "Compile crop calendars from agricultural universities", "sources": ["external"], "done": true, "priority": "high", "next": false, "assignee": ""}, {"id": "t31", "desc": "Adjust for regional climate variations", "sources": ["external", "derived"], "done": true, "priority": "medium", "next": false, "assignee": ""}, {"id": "t32", "desc": "Auto-update from Plantix detection patterns", "sources": ["plantix", "derived"], "done": false, "priority": "low", "next": false, "assignee": ""}]}, {"id": "farmer-treatment-behavior", "name": "Farmer Treatment Behavior", "icon": "🧑‍🌾", "versions": [{"label": "v0", "status": "done", "desc": "Uniform assumption — all diseases treated equally"}, {"label": "v1", "status": "in-progress", "desc": "Weight by damage score (1-5) per crop-disease"}, {"label": "v2", "status": "planned", "desc": "Plantix detection prevalence data per geography"}], "notes": "Narrows TAM down to SOM — the share that reflects real purchasing behaviour. Not all farmers who face a treatable disease actually spray. Like pharma \"treatment rate\" — not all diagnosed patients get treated.", "tasks": [{"id": "fb-1", "desc": "Baseline: uniform treatment assumption across all diseases", "sources": ["derived"], "done": true, "next": false, "assignee": ""}, {"id": "fb-2", "desc": "Weight by existing damage scores (1-5) for crop-disease combinations", "sources": ["derived"], "done": false, "next": false, "assignee": ""}, {"id": "fb-3", "desc": "Use % of Plantix images showing specific disease per geography as prevalence", "sources": ["plantix", "derived"], "done": false, "next": false, "assignee": ""}, {"id": "fb-4", "desc": "Collect farmer-reported damage level and whether they treated or not", "sources": ["plantix"], "done": false, "next": false, "assignee": ""}, {"id": "fb-5", "desc": "Collect product effectiveness outcomes via in-app surveys", "sources": ["plantix"], "done": false, "next": false, "assignee": ""}, {"id": "fb-6", "desc": "Correlate with commodity prices — cross-validate with LDC back-testing (disease pressure vs yield impact for pulses)", "sources": ["external", "derived"], "done": false, "next": false, "assignee": ""}, {"id": "fb-7", "desc": "Collect actual yield data and harvest dates via in-app surveys", "sources": ["plantix"], "done": false, "next": false, "assignee": ""}, {"id": "fb-8", "desc": "Collect treatment application timing via in-app surveys (week/growth stage)", "sources": ["plantix"], "done": false, "next": false, "assignee": ""}, {"id": "fb-9", "desc": "Model scouting gap — farmer detection lag affects curative vs preventative TAM", "sources": ["plantix", "derived"], "done": false, "next": false, "assignee": ""}, {"id": "fb-10", "desc": "Model preventative spraying patterns (calendar-based or neighbour-driven)", "sources": ["plantix", "derived"], "done": false, "next": false, "assignee": ""}, {"id": "fb-11", "desc": "Account for leftover stock usage from previous seasons", "sources": ["derived"], "done": false, "next": false, "assignee": ""}, {"id": "fb-12", "desc": "Use Plantix popularity data as behavioral signal for farmer awareness/intent", "sources": ["plantix", "derived"], "done": false, "next": false, "assignee": ""}]}, {"id": "soil-moisture", "name": "Soil Moisture", "icon": "💧", "notes": "", "tasks": []}], "lastSaved": "2026-03-19T09:59:31.090Z", "availableTags": ["Sales", "UX", "Internal"]};
+const BAKED_DATA = {
+  "personas": [
+    {
+      "id": "farmer",
+      "name": "Farmer",
+      "icon": "👨‍🌾"
+    },
+    {
+      "id": "crop-protection",
+      "name": "Crop Protection (+Herbicides) Company",
+      "icon": "🛡️"
+    },
+    {
+      "id": "seed",
+      "name": "Seed Companies",
+      "icon": "🌱"
+    },
+    {
+      "id": "fertilizer",
+      "name": "Fertilizer / Bio-Stimulant Companies",
+      "icon": "🌿"
+    },
+    {
+      "id": "commodity",
+      "name": "Commodity Traders / Food Processors",
+      "icon": "📦"
+    }
+  ],
+  "useCases": [
+    {
+      "id": "cp-1",
+      "personaId": "crop-protection",
+      "role": "Marketing Head",
+      "text": "Plan marketing campaigns and field events, with 1–2 weeks heads up before disease spikes",
+      "layers": [
+        "disease-incidences",
+        "growth-stage",
+        "demand-forecast",
+        "farmer-treatment-behavior"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "cp-2",
+      "personaId": "crop-protection",
+      "role": "Sales Head",
+      "text": "Know how many bottles/liters to set as sales target per subdistrict",
+      "layers": [
+        "acreage",
+        "farmer-value",
+        "treatment",
+        "demand-forecast",
+        "sales-data"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "cp-3",
+      "personaId": "crop-protection",
+      "role": "Sales Head",
+      "text": "Get an overview of what's happening on the ground right now",
+      "layers": [
+        "disease-incidences",
+        "demand-forecast",
+        "growth-stage",
+        "farmer-treatment-behavior"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "cp-4",
+      "personaId": "crop-protection",
+      "role": "Field Agent",
+      "text": "Know what to talk about with farmers — which diseases are active, which products to recommend",
+      "layers": [
+        "disease-incidences",
+        "treatment"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "cp-5",
+      "personaId": "crop-protection",
+      "role": "CEO / CMO",
+      "text": "Plan expansion into new regions, identify biggest TAM pockets",
+      "layers": [
+        "acreage",
+        "farmer-value",
+        "treatment",
+        "sales-data"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "cp-6",
+      "personaId": "crop-protection",
+      "role": "Marketing Head",
+      "text": "Know when seeds go in the ground and current crop stages (herbicide window timing)",
+      "layers": [
+        "sowing-date",
+        "growth-stage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "cp-7",
+      "personaId": "crop-protection",
+      "role": "Shopkeeper",
+      "text": "Stay knowledgeable about spreading diseases and upcoming products",
+      "layers": [
+        "disease-incidences",
+        "treatment"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "sd-1",
+      "personaId": "seed",
+      "role": "Sales / Marketing Head",
+      "text": "Know how much seed varieties to ship where — unsold stock becomes cow fodder",
+      "layers": [
+        "acreage",
+        "sowing-date"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "sd-2",
+      "personaId": "seed",
+      "role": "Research / Breeding",
+      "text": "Understand disease pattern trends and spot new emerging diseases",
+      "layers": [
+        "disease-incidences",
+        "weather"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "sd-3",
+      "personaId": "seed",
+      "role": "Marketing Head",
+      "text": "Know where which crops are planted and likely diseases for Q1/Q2 planning",
+      "layers": [
+        "acreage",
+        "disease-incidences",
+        "sowing-date"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-1",
+      "personaId": "fertilizer",
+      "role": "Sales Head",
+      "text": "Get crop acreage and growth stage overview for TAM per subdistrict",
+      "layers": [
+        "acreage",
+        "growth-stage",
+        "farmer-value"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-2",
+      "personaId": "fertilizer",
+      "role": "CEO / CMO",
+      "text": "Identify patterns of recurring nutrient deficiencies",
+      "layers": [
+        "disease-incidences",
+        "acreage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-3",
+      "personaId": "fertilizer",
+      "role": "Marketing Head",
+      "text": "Know crop stages for next fertilization period",
+      "layers": [
+        "growth-stage",
+        "sowing-date"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-4",
+      "personaId": "fertilizer",
+      "role": "Marketing Head",
+      "text": "Know when plants have physical stress (bio-stimulant timing)",
+      "layers": [
+        "weather",
+        "growth-stage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-5",
+      "personaId": "fertilizer",
+      "role": "Marketing Head",
+      "text": "Understand soil patterns for micronutrients focus areas",
+      "layers": [
+        "weather",
+        "acreage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-6",
+      "personaId": "fertilizer",
+      "role": "Marketing Head",
+      "text": "Find high density vegetable crop areas (higher spend potential)",
+      "layers": [
+        "acreage",
+        "farmer-value"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fe-7",
+      "personaId": "fertilizer",
+      "role": "Marketing Head",
+      "text": "Identify crop patterns for specialty product targeting",
+      "layers": [
+        "acreage",
+        "growth-stage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "co-1",
+      "personaId": "commodity",
+      "role": "Procurement Manager",
+      "text": "Get mid-season yield forecasts at district level",
+      "layers": [
+        "acreage",
+        "weather",
+        "growth-stage",
+        "disease-incidences"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-1",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Diagnose what disease or pest is affecting my crop from a photo",
+      "layers": [
+        "disease-incidences",
+        "treatment"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-2",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Get the right treatment recommendation and product dosage for my field size",
+      "layers": [
+        "treatment",
+        "acreage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-3",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Know what growth stage my crop is in and what to do next",
+      "layers": [
+        "growth-stage",
+        "crop-calendar"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-4",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Get timely alerts about disease outbreaks spreading in my area",
+      "layers": [
+        "disease-incidences",
+        "weather"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-5",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Know the best sowing window for my crop and region",
+      "layers": [
+        "sowing-date",
+        "crop-calendar",
+        "weather"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-6",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Understand weather impact on my crop and plan accordingly",
+      "layers": [
+        "weather",
+        "growth-stage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-7",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Learn from short educational videos and tips about my specific crop problems",
+      "layers": [
+        "disease-incidences",
+        "treatment",
+        "crop-calendar"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "fm-8",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "Share disease findings with other farmers in my community via WhatsApp",
+      "layers": [
+        "disease-incidences"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-1",
+      "personaId": "crop-protection",
+      "role": "R&D Researcher",
+      "text": "Get real-time, field-level disease incidence data across multiple states to identify emerging threats and prioritize research",
+      "layers": [
+        "disease-incidences"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-2",
+      "personaId": "crop-protection",
+      "role": "R&D Team",
+      "text": "Use disease forecasting models combining weather, historical data, and crop growth stage to anticipate outbreaks 1–2 weeks ahead",
+      "layers": [
+        "disease-incidences",
+        "weather",
+        "growth-stage",
+        "demand-forecast"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-3",
+      "personaId": "crop-protection",
+      "role": "R&D Scientist",
+      "text": "Correlate disease pressure data with yield impact to validate product efficacy and build economic justification",
+      "layers": [
+        "disease-incidences",
+        "acreage",
+        "farmer-treatment-behavior"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-4",
+      "personaId": "crop-protection",
+      "role": "Product Development",
+      "text": "Access farmer-submitted photo data to validate crop models, train AI, and improve product recommendations",
+      "layers": [
+        "disease-incidences",
+        "growth-stage"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-5",
+      "personaId": "crop-protection",
+      "role": "R&D Team",
+      "text": "Use Plantix data for research beyond commercial support — testing formulations, understanding disease ecology, validating models",
+      "layers": [
+        "disease-incidences",
+        "weather",
+        "growth-stage",
+        "treatment"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-6",
+      "personaId": "crop-protection",
+      "role": "R&D Content Creator",
+      "text": "Efficiently translate technical R&D knowledge into field-usable sales enablement content",
+      "layers": [
+        "disease-incidences",
+        "treatment"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "rd-7",
+      "personaId": "crop-protection",
+      "role": "R&D Researcher",
+      "text": "Integrate crop growth stage detection with disease data to understand optimal product application timing windows",
+      "layers": [
+        "growth-stage",
+        "disease-incidences",
+        "treatment"
+      ],
+      "tags": [
+        "Sales"
+      ]
+    },
+    {
+      "id": "uc-1773914371090",
+      "personaId": "seed",
+      "role": "Sales Head",
+      "text": "As a sales head at a seed company, I want to see SRR by crop and region, so that I can identify untapped markets where farmers need seed treatment and direct my sales team accordingly.",
+      "layers": [
+        "acreage",
+        "growth-stage",
+        "sowing-date"
+      ]
+    }
+  ],
+  "layers": [
+    {
+      "id": "disease-incidences",
+      "name": "Disease Incidences",
+      "icon": "🦠",
+      "status": "green",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Raw detection counts per crop-district"
+        },
+        {
+          "label": "v1",
+          "status": "in-progress",
+          "desc": "Normalized incidence rates with confidence"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Predictive outbreak alerts"
+        }
+      ],
+      "notes": "Core layer — feeds the most use cases. Dependent on detection model accuracy.",
+      "tasks": [
+        {
+          "id": "t1",
+          "desc": "Aggregate detections by district-crop-week",
+          "sources": [
+            "plantix"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t2",
+          "desc": "Normalize by user base to get incidence rate",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t1773827453109",
+          "desc": "For maize,rice - add the angle of prevention /curative",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Agronomy"
+        },
+        {
+          "id": "t1773827489643",
+          "desc": "For cotton, soybean - mapping  growth stage //sensitivity // treatbility // prevention-curation (for highest impact crop/diseases)",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Andjela"
+        }
+      ]
+    },
+    {
+      "id": "acreage",
+      "name": "Acreage",
+      "icon": "🗺️",
+      "status": "orange",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Government statistics baseline"
+        },
+        {
+          "label": "v1",
+          "status": "in-progress",
+          "desc": "Satellite-validated estimates"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Subdistrict-level granularity"
+        }
+      ],
+      "notes": "Combines government data with satellite validation. Key gap: subdistrict granularity. We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)",
+      "tasks": [
+        {
+          "id": "t5",
+          "desc": "Ingest government crop statistics (state/district)",
+          "sources": [
+            "external"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t6",
+          "desc": "Validate with satellite imagery (NDVI-based)",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t7",
+          "desc": "Downscale to subdistrict using cropland data",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": true,
+          "priority": "medium",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t8",
+          "desc": "Seasonal update pipeline",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": false,
+          "priority": "medium",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t1773826607058",
+          "desc": "Include horticultural data and incorporate datachecks to understand the completenes/validity of the data (start with top crops)",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Yiannis & Sunil"
+        },
+        {
+          "id": "t1773827056735",
+          "desc": "Ask farmers to import their sowing date and the crop they are planning to sow (this can help us on the deltas from season to season)",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Plantix App"
+        }
+      ]
+    },
+    {
+      "id": "growth-stage",
+      "name": "Growth Stage",
+      "icon": "🌾",
+      "status": "orange",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Calendar-based estimates"
+        },
+        {
+          "label": "v1",
+          "status": "in-progress",
+          "desc": "Detection-derived growth stages"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "GDD-model integration"
+        }
+      ],
+      "notes": "Currently calendar-based. Photo-based detection being validated.",
+      "tasks": [
+        {
+          "id": "t9",
+          "desc": "Define growth stage calendar per crop-region",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t1773827267292",
+          "desc": "Add crop timeline indicators for the crops soybean and cotton",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Andjela/Agronomy"
+        },
+        {
+          "id": "t1773829263090",
+          "desc": "Add growth stage for horticultural crops (tomato, potato, onion, chilli)",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Andjela to discuss with Thomas"
+        }
+      ]
+    },
+    {
+      "id": "sowing-date",
+      "name": "Sowing Date",
+      "icon": "📅",
+      "status": "green",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Historical calendar windows"
+        },
+        {
+          "label": "v1",
+          "status": "done",
+          "desc": "Detection-spike-based estimation"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Farm-level precision"
+        }
+      ],
+      "notes": "Good coverage via detection spike analysis. v1 validated for major crops.",
+      "tasks": [
+        {
+          "id": "t12",
+          "desc": "Establish sowing windows from historical data",
+          "sources": [
+            "external"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t13",
+          "desc": "Detect sowing date from first-detection spikes",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t14",
+          "desc": "Validate against ground truth surveys",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "priority": "medium",
+          "next": false,
+          "assignee": ""
+        }
+      ]
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "icon": "🌦️",
+      "status": "green",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "District-level daily weather"
+        },
+        {
+          "label": "v1",
+          "status": "done",
+          "desc": "7-day forecasts integrated"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Hyperlocal weather stations"
+        }
+      ],
+      "notes": "Solid external data source. API pipeline stable.",
+      "tasks": [
+        {
+          "id": "t15",
+          "desc": "Ingest daily weather data via API",
+          "sources": [
+            "external"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t16",
+          "desc": "Add 7-day forecast integration",
+          "sources": [
+            "external"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t17",
+          "desc": "Evaluate hyperlocal weather station partnerships",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "priority": "low",
+          "next": false,
+          "assignee": ""
+        }
+      ]
+    },
+    {
+      "id": "farmer-value",
+      "name": "Farmer Value",
+      "icon": "💰",
+      "status": "orange",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Proxy from acreage × avg spend"
+        },
+        {
+          "label": "v1",
+          "status": "in-progress",
+          "desc": "Segment-level value tiers"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Individual farmer scoring"
+        }
+      ],
+      "notes": "Currently a derived proxy. Needs sales data integration for validation.",
+      "tasks": [
+        {
+          "id": "t18",
+          "desc": "Build basic proxy: acreage × average input spend",
+          "sources": [
+            "derived"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t1773827142125",
+          "desc": "Analyse the expenses imported in the calculators in the plantix farmer app - are we able to understand the split between CP/Fertiliser/Herbicides and see any groupings with crop and/or state level?",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Yiannis"
+        }
+      ]
+    },
+    {
+      "id": "treatment",
+      "name": "Treatment Recommendations",
+      "icon": "💊",
+      "status": "green",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Static recommendation database"
+        },
+        {
+          "label": "v1",
+          "status": "done",
+          "desc": "Region-aware recommendations"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Efficacy-scored recommendations"
+        }
+      ],
+      "notes": "Well-established. v2 needs field trial data.",
+      "tasks": [
+        {
+          "id": "t21",
+          "desc": "Curate treatment database per disease-crop",
+          "sources": [
+            "external"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t22",
+          "desc": "Add regional product availability filtering",
+          "sources": [
+            "external",
+            "plantix"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t1773827682850",
+          "desc": "How do we map now the technicals companies to crop/diseases and dosages? Can we explore ways to add automation in the process? (rob vibe coded something) - focus on labeled claims",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Yiannis & Celine"
+        }
+      ]
+    },
+    {
+      "id": "demand-forecast",
+      "name": "Demand Forecast",
+      "icon": "📊",
+      "status": "red",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "in-progress",
+          "desc": "Rule-based demand signals"
+        },
+        {
+          "label": "v1",
+          "status": "planned",
+          "desc": "ML-based demand prediction"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Real-time demand dashboard"
+        }
+      ],
+      "notes": "Earliest stage. Depends on Disease Incidences + Acreage + Growth Stage being solid.",
+      "tasks": [
+        {
+          "id": "t24",
+          "desc": "Define demand signal rules (disease spike → product need)",
+          "sources": [
+            "derived"
+          ],
+          "done": false,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t25",
+          "desc": "Build demand estimation model",
+          "sources": [
+            "derived",
+            "plantix"
+          ],
+          "done": false,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t26",
+          "desc": "Partner pilot for demand validation",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "priority": "medium",
+          "next": false,
+          "assignee": ""
+        }
+      ]
+    },
+    {
+      "id": "sales-data",
+      "name": "Sales Data",
+      "icon": "🧾",
+      "status": "red",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "planned",
+          "desc": "Partner sales data ingestion"
+        },
+        {
+          "label": "v1",
+          "status": "planned",
+          "desc": "Normalized cross-partner view"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Sales × detection correlation"
+        }
+      ],
+      "notes": "Blocked on partner data sharing agreements. Critical for Farmer Value validation.",
+      "tasks": [
+        {
+          "id": "t27",
+          "desc": "CropLife industry sales data: Old 2018 report available by technical × state × crop (INR values plus avg price and quantity at country level); volume-based reports also exist. Newer reports being explored. If Croplife is not possible to look at alternatives",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "priority": "high",
+          "next": true,
+          "assignee": "Sunil"
+        },
+        {
+          "id": "t1773826920156",
+          "desc": "Retailer sales data",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Sunil"
+        },
+        {
+          "id": "t1773830873646",
+          "desc": "Derive the number of treatable acres (acreage x disease x growth stage x treatiblity) - for maize",
+          "sources": [
+            "derived"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Yiannis"
+        }
+      ]
+    },
+    {
+      "id": "crop-calendar",
+      "name": "Crop Calendar",
+      "icon": "📆",
+      "status": "green",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Expert-curated calendars"
+        },
+        {
+          "label": "v1",
+          "status": "done",
+          "desc": "Region-specific adjustments"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Dynamic calendar from detections"
+        }
+      ],
+      "notes": "Stable foundation. Powers Growth Stage and Sowing Date layers.",
+      "tasks": [
+        {
+          "id": "t30",
+          "desc": "Compile crop calendars from agricultural universities",
+          "sources": [
+            "external"
+          ],
+          "done": true,
+          "priority": "high",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t31",
+          "desc": "Adjust for regional climate variations",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": true,
+          "priority": "medium",
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "t32",
+          "desc": "Auto-update from Plantix detection patterns",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": false,
+          "priority": "low",
+          "next": false,
+          "assignee": ""
+        }
+      ]
+    },
+    {
+      "id": "farmer-treatment-behavior",
+      "name": "Farmer Treatment Behavior",
+      "icon": "🧑‍🌾",
+      "versions": [
+        {
+          "label": "v0",
+          "status": "done",
+          "desc": "Uniform assumption — all diseases treated equally"
+        },
+        {
+          "label": "v1",
+          "status": "in-progress",
+          "desc": "Weight by damage score (1-5) per crop-disease"
+        },
+        {
+          "label": "v2",
+          "status": "planned",
+          "desc": "Plantix detection prevalence data per geography"
+        }
+      ],
+      "notes": "Narrows TAM down to SOM — the share that reflects real purchasing behaviour. Not all farmers who face a treatable disease actually spray. Like pharma \"treatment rate\" — not all diagnosed patients get treated.",
+      "tasks": [
+        {
+          "id": "fb-1",
+          "desc": "Baseline: uniform treatment assumption across all diseases",
+          "sources": [
+            "derived"
+          ],
+          "done": true,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-2",
+          "desc": "Weight by existing damage scores (1-5) for crop-disease combinations",
+          "sources": [
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-3",
+          "desc": "Use % of Plantix images showing specific disease per geography as prevalence",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-4",
+          "desc": "Collect farmer-reported damage level and whether they treated or not",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-5",
+          "desc": "Collect product effectiveness outcomes via in-app surveys",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-6",
+          "desc": "Correlate with commodity prices — cross-validate with LDC back-testing (disease pressure vs yield impact for pulses)",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-7",
+          "desc": "Collect actual yield data and harvest dates via in-app surveys",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-8",
+          "desc": "Collect treatment application timing via in-app surveys (week/growth stage)",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-9",
+          "desc": "Model scouting gap — farmer detection lag affects curative vs preventative TAM",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-10",
+          "desc": "Model preventative spraying patterns (calendar-based or neighbour-driven)",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-11",
+          "desc": "Account for leftover stock usage from previous seasons",
+          "sources": [
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        },
+        {
+          "id": "fb-12",
+          "desc": "Use Plantix popularity data as behavioral signal for farmer awareness/intent",
+          "sources": [
+            "plantix",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": ""
+        }
+      ]
+    },
+    {
+      "id": "soil-moisture",
+      "name": "Soil Moisture",
+      "icon": "💧",
+      "notes": "",
+      "tasks": []
+    }
+  ],
+  "lastSaved": "2026-03-19T09:59:31.090Z",
+  "availableTags": [
+    "Sales",
+    "UX",
+    "Internal"
+  ]
+};
 
 // ============================================================
 // DEFAULT DATA — PERSONAS
@@ -1254,7 +2530,7 @@ if (IS_READONLY) {
   const feedbackLink = document.createElement('a');
   feedbackLink.className = 'feedback-btn';
   feedbackLink.textContent = 'Give Feedback';
-  feedbackLink.href = 'https://github.com/Androniki/data-layer-workbench/issues/new?template=feedback.md&title=Feedback%3A+';
+  feedbackLink.href = 'https://github.com/PEAT-AI/data-layer-workbench/issues/new?template=feedback.md&title=Feedback%3A+';
   feedbackLink.target = '_blank';
   topBarRight.prepend(feedbackLink);
   // Disable contenteditable on all elements
