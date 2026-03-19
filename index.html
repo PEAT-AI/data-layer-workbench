@@ -372,7 +372,7 @@ body.readonly .top-bar-right { gap: 0; }
 
 <script>
 const STORAGE_KEY = 'plantix-dlw-v5';
-const IS_READONLY = new URLSearchParams(window.location.search).get('mode') === 'view';
+const IS_READONLY = new URLSearchParams(window.location.search).get('mode') !== 'edit';
 const BAKED_DATA = null;
 
 // ============================================================
