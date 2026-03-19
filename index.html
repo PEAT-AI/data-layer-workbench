@@ -380,7 +380,7 @@ body.readonly .top-bar-right { gap: 8px; }
 <script>
 const STORAGE_KEY = 'plantix-dlw-v5';
 const IS_READONLY = new URLSearchParams(window.location.search).get('mode') !== 'edit';
-const BAKED_DATA = {
+const DATA = {
   "personas": [
     {
       "id": "farmer",
@@ -1950,7 +1950,7 @@ function getDefaultState() {
 }
 
 function loadState() {
-  if (BAKED_DATA) return JSON.parse(JSON.stringify(BAKED_DATA));
+  if (DATA) return JSON.parse(JSON.stringify(DATA));
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
