@@ -335,6 +335,12 @@ body.readonly .assignee-input { border: none; background: transparent; pointer-e
 body.readonly .source-pill { pointer-events: none; cursor: default; }
 body.readonly .task-checkbox { pointer-events: none; cursor: default; }
 body.readonly .top-bar-right { gap: 0; }
+.feedback-btn {
+  padding: 7px 16px; border-radius: 8px; border: 1px solid #2563eb; background: #2563eb;
+  font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; color: #fff;
+  transition: all 0.15s; text-decoration: none;
+}
+.feedback-btn:hover { background: #1d4ed8; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
@@ -1237,7 +1243,15 @@ function truncate(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
 // ============================================================
 if (IS_READONLY) {
   document.body.classList.add('readonly');
-  // In readonly mode, disable contenteditable on all elements
+  // Add feedback button to top bar
+  const topBarRight = document.querySelector('.top-bar-right');
+  const feedbackLink = document.createElement('a');
+  feedbackLink.className = 'feedback-btn';
+  feedbackLink.textContent = 'Give Feedback';
+  feedbackLink.href = 'https://github.com/Androniki/data-layer-workbench/issues/new?template=feedback.md&title=Feedback%3A+';
+  feedbackLink.target = '_blank';
+  topBarRight.prepend(feedbackLink);
+  // Disable contenteditable on all elements
   const observer = new MutationObserver(() => {
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
       el.contentEditable = 'false';
