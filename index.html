@@ -43,7 +43,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 /* MAIN LAYOUT */
 .main-layout { display: flex; min-height: calc(100vh - 100px); }
 .content-area {
-  flex: 1; padding: 28px 32px; overflow-y: auto;
+  flex: 1; padding: 20px 24px; overflow-y: auto;
   transition: opacity 0.2s ease;
 }
 .content-area.fading { opacity: 0; }
@@ -2476,17 +2476,17 @@ function renderLayersHome(el) {
     const countB = state.useCases.filter(u => u.layers.includes(b.id)).length;
     return countB - countA;
   });
-  let html = '<div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">';
+  let html = '<div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">';
   for (const layer of sortedLayers) {
     const ucCount = state.useCases.filter(u => u.layers.includes(layer.id)).length;
     const nextCount = layer.tasks.filter(t => t.next && !t.done).length;
     const openCount = layer.tasks.filter(t => !t.done && !t.next).length;
     const doneCount = layer.tasks.filter(t => t.done).length;
-    html += `<div class="card" onclick="navigate(3, {layerId:'${layer.id}'})">
-      <div style="font-size:32px;margin-bottom:12px;">${layer.icon}</div>
-      <div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:4px;">${escHtml(layer.name)}</div>
-      <div style="font-size:12px;color:#64748b;margin-bottom:12px;">${ucCount} use case${ucCount !== 1 ? 's' : ''}</div>
-      <div style="display:flex;gap:12px;font-size:11px;">
+    html += `<div class="card" style="padding:16px;" onclick="navigate(3, {layerId:'${layer.id}'})">
+      <div style="font-size:24px;margin-bottom:8px;">${layer.icon}</div>
+      <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:2px;">${escHtml(layer.name)}</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px;">${ucCount} use case${ucCount !== 1 ? 's' : ''}</div>
+      <div style="display:flex;gap:8px;font-size:10px;">
         ${nextCount > 0 ? `<span style="color:#2563eb;font-weight:600;">${nextCount} next</span>` : ''}
         ${openCount > 0 ? `<span style="color:#64748b;">${openCount} open</span>` : ''}
         ${doneCount > 0 ? `<span style="color:#94a3b8;">${doneCount} done</span>` : ''}
@@ -2495,18 +2495,16 @@ function renderLayersHome(el) {
   }
   html += '</div>';
 
-  html += `<div style="margin-top:48px;padding:28px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-bottom:16px;">Resources</div>
-    <div style="display:flex;flex-wrap:wrap;gap:24px;margin-bottom:24px;">
-      <a href="https://docs.google.com/document/d/1xtxwnpdph8GsIKrsdEwNvXHKzOmsaMzSJ2ROXnKDEUI/edit?tab=t.0#heading=h.wmybhf83v7kp" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">Roadshow User Stories from Sales ↗</a>
-      <a href="https://docs.google.com/spreadsheets/d/1N61gRkLo3RESMWoPJsY8XPZy5gF2OGwaD1YDmoMDpYI/edit?gid=1566468736#gid=1566468736" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">User Stories from User Research ↗</a>
-      <a href="https://github.com/PEAT-AI/Mosquito" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">Mosquito GitHub ↗</a>
-      <a href="https://app.asana.com/1/1162751913058161/project/1213717171617853/list/1213717211721845" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">Asana Board ↗</a>
+  html += `<div style="margin-top:20px;padding:16px 20px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-right:4px;">Resources</span>
+      <a href="https://docs.google.com/document/d/1xtxwnpdph8GsIKrsdEwNvXHKzOmsaMzSJ2ROXnKDEUI/edit?tab=t.0#heading=h.wmybhf83v7kp" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">Sales User Stories ↗</a>
+      <a href="https://docs.google.com/spreadsheets/d/1N61gRkLo3RESMWoPJsY8XPZy5gF2OGwaD1YDmoMDpYI/edit?gid=1566468736#gid=1566468736" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">UX Research ↗</a>
+      <a href="https://github.com/PEAT-AI/Mosquito" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">Mosquito ↗</a>
+      <a href="https://app.asana.com/1/1162751913058161/project/1213717171617853/list/1213717211721845" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">Asana ↗</a>
     </div>
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-bottom:12px;">Process</div>
-    <div style="font-size:13px;color:#334155;line-height:1.7;">
-      Every Friday: user stories are updated from the documents, and Mosquito P0 issues are added.<br>
-      Monday morning: review session with Rob — priorities to be set to build the data layers.
+    <div style="font-size:12px;color:#64748b;line-height:1.6;">
+      Friday: update user stories + add Mosquito P0 issues. Monday AM: review with Rob, set priorities.
     </div>
   </div>`;
 
