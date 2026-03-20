@@ -805,7 +805,8 @@ const DATA = {
         "disease-incidences",
         "weather",
         "growth-stage",
-        "treatment"
+        "treatment",
+        "farmer-treatment-behavior"
       ],
       "tags": [
         "Sales"
@@ -818,7 +819,9 @@ const DATA = {
       "text": "Efficiently translate technical R&D knowledge into field-usable sales enablement content",
       "layers": [
         "disease-incidences",
-        "treatment"
+        "treatment",
+        "growth-stage",
+        "weather"
       ],
       "tags": [
         "Sales"
@@ -854,7 +857,12 @@ const DATA = {
       "personaId": "crop-protection",
       "role": "Portfolio Manager / Supply Chain / Sales Head",
       "text": "Predict which products to stock in which quantities and regions with a real-time, district-level view of crop acreage, shifting cropping patterns, and pest outbreak probabilities — to avoid chronic over-stocking in wrong geographies and under-stocking during peak demand windows",
-      "layers": [],
+      "layers": [
+        "demand-forecast",
+        "acreage",
+        "treatment",
+        "weather"
+      ],
       "tags": [
         "UX"
       ]
@@ -864,7 +872,12 @@ const DATA = {
       "personaId": "crop-protection",
       "role": "Regional Manager / Portfolio Manager",
       "text": "Know which pests are spreading in which districts in time to advise field staff and adjust stock positioning — current systems aggregate data too slowly and too sparsely, resulting in delayed recommendations and wrong molecules being promoted",
-      "layers": [],
+      "layers": [
+        "disease-incidences",
+        "acreage",
+        "growth-stage",
+        "treatment"
+      ],
       "tags": [
         "UX"
       ]
@@ -904,7 +917,9 @@ const DATA = {
       "personaId": "crop-protection",
       "role": "Marketing Manager",
       "text": "Coordinate campaign activities with the sales team — pricing schemes and product placement are finalized by sales without informing marketing, and demo outcomes are not tracked, resulting in misaligned messaging and marketing budgets spent on campaigns that don't match what sales is pushing",
-      "layers": [],
+      "layers": [
+        "prices-of-products"
+      ],
       "tags": [
         "UX"
       ]
@@ -914,7 +929,11 @@ const DATA = {
       "personaId": "crop-protection",
       "role": "Sales / Marketing Head",
       "text": "Protect seasonal investment from weather and external shocks — narrow spray/sowing windows mean 3–7 days of unseasonal rain or unexpected events can invalidate months of product pre-placement and marketing spend, resulting in large unsold inventory returns and financial write-offs",
-      "layers": [],
+      "layers": [
+        "growth-stage",
+        "demand-forecast",
+        "weather"
+      ],
       "tags": [
         "UX"
       ]
@@ -934,7 +953,10 @@ const DATA = {
       "personaId": "crop-protection",
       "role": "Portfolio Manager / Area Sales Manager",
       "text": "Maintain product differentiation and margin — generic look-alike products priced 30–50% lower crowd the shelf, and retailers switch brands for better credit terms, resulting in brand erosion and shrinking market share",
-      "layers": [],
+      "layers": [
+        "prices-of-products",
+        "farmer-treatment-behavior"
+      ],
       "tags": [
         "UX"
       ]
@@ -1722,9 +1744,23 @@ const DATA = {
           "assignee": ""
         }
       ]
+    },
+    {
+      "id": "prices-of-products",
+      "name": "Prices of Products",
+      "icon": "$",
+      "notes": "",
+      "tasks": []
+    },
+    {
+      "id": "prices-of-commodities",
+      "name": "Prices of Commodities",
+      "icon": "📄",
+      "notes": "",
+      "tasks": []
     }
   ],
-  "lastSaved": "2026-03-19T09:59:31.090Z",
+  "lastSaved": "2026-03-20T12:23:01.908Z",
   "availableTags": [
     "Sales",
     "UX",
