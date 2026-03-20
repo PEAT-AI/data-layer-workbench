@@ -1193,6 +1193,18 @@ const DATA = {
           "done": false,
           "next": true,
           "assignee": "Andjela to discuss with Thomas"
+        },
+        {
+          "id": "t-183",
+          "desc": "#183 — ERA5 Growing Degree Days (Dynamic Crop Phenology): Replaces the static FAO-56 trapezoidal crop lifecycle with a GDD accumulation model driven by ERA5-Land daily temperatures (~9km). This fixes the core problem that a fixed ISO-week calendar breaks when the monsoon arrives late (e.g. El Niño years). GDD deltas are stored per crop in BQ (rice T_base=10°C, cotton=15°C, etc.) and accumulated from the SMAP-detected sowing week.",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": "",
+          "asanaUrl": ""
         }
       ],
       "overview": "We have different directions in order to get to the growth stage. \n1. The first approach is to have a vision-based growth stage using the BBCH scale. We are working with the following crops: soybean, cotton, rice, maize, and we are exploring adding horticultural crops as well. The expectation for a new crop is from two to five days to add on the model. \n2. We are also working on deriving growth stage using the sowing date and the maturity type from a Plantix Farmer app. \n3. If we don't have any of the above, then we are going back to estimating the monsoon start, the sowing, and the average maturity to then define the different crop stages. ",
@@ -1270,6 +1282,17 @@ const DATA = {
           "priority": "medium",
           "next": false,
           "assignee": ""
+        },
+        {
+          "id": "t-184",
+          "desc": "#184 — SMAP Soil Moisture (Start-of-Season Trigger): Replaces hardcoded KHARIF_START=23 / RABI_START=44 with per-subdistrict sowing detection using NASA SMAP surface soil moisture (~10km). When SSM crosses a threshold of the historical median, sowing is flagged — this shifts rainfed crop lifecycles dynamically. If SMAP data is unavailable, the pipeline falls back to the existing static calendar.",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": "",
+          "asanaUrl": ""
         }
       ]
     },
@@ -1329,6 +1352,18 @@ const DATA = {
           "priority": "low",
           "next": false,
           "assignee": ""
+        },
+        {
+          "id": "t-200",
+          "desc": "#200 — Climate Analog Year Model (ENSO/IOD Scenario Impact Curves): Materializes subdistrict-level climate scenario curves by compositing historical ERA5-Land data from analog years (e.g. 2009/2015 for severe El Niño). The key insight is that state-level scalars are wrong — Tamil Nadu actually gets more rain during El Niño (NE monsoon intensifies), and IOD can cancel El Niño drought in central India. Outputs 5 scenarios × 6,736 subdistricts × 52 weeks into a ref_analog_scenarios table consumed by the Scenario Engine (#197).",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": "",
+          "asanaUrl": ""
         }
       ]
     },
@@ -1515,6 +1550,18 @@ const DATA = {
           "priority": "medium",
           "next": false,
           "assignee": ""
+        },
+        {
+          "id": "t-185",
+          "desc": "#185 — CHIRPS Precipitation (Drought Mortality Penalty): Adds a multiplicative drought penalty on standing_crop_ha using CHIRPS daily precipitation (~5.5km) from UCSB/Google Earth Engine. If the rolling 4-week rainfall drops below 60% of the historical median, standing crop area is penalized down to a floor of 0.2 (never fully zeroes demand). Irrigated crops and the bio/nutrient lane are explicitly excluded from the penalty.",
+          "sources": [
+            "external",
+            "derived"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": "",
+          "asanaUrl": ""
         }
       ],
       "dataLinks": [
@@ -1811,7 +1858,19 @@ const DATA = {
       "name": "Prices of Commodities",
       "icon": "📈",
       "notes": "- Agmarknet (agmarknet.gov.in): daily modal prices and arrival volumes per mandi, ~7,000 mandis. Formula: price_anomaly_pct = (current_price / 5yr_median) - 1.0 (Pedro)",
-      "tasks": [],
+      "tasks": [
+        {
+          "id": "t-190",
+          "desc": "#190 — Agmarknet Mandi Prices (Farmer Willingness-to-Pay): Integrates daily commodity prices from ~3,000 mandis via the government data.gov.in API. Each subdistrict is mapped to its 3 nearest mandis (within the same state — no cross-state bleed due to tax differences), and prices are volume-weighted (not distance-weighted). Phase 2 will modulate spray adoption by a [0.6, 1.4] multiplier based on 5-year price percentile rank once 6+ months of history are available.",
+          "sources": [
+            "external"
+          ],
+          "done": false,
+          "next": false,
+          "assignee": "",
+          "asanaUrl": ""
+        }
+      ],
       "dataLinks": [
         {
           "label": "BQ Magpie Prices",
