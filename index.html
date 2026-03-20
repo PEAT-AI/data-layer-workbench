@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Layer Workbench — Plantix</title>
+<title>Plantix Data Intelligence Layers</title>
+<link rel="icon" href="favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -414,7 +415,8 @@ body:not(.authenticated) .main-layout { display: none; }
 
 <div class="auth-gate" id="authGate">
   <div class="auth-box">
-    <h2>Data Layer Workbench</h2>
+    <img src="favicon.ico" alt="Plantix" style="height:32px;width:32px;margin-bottom:12px;">
+    <h2>Plantix Data Intelligence Layers</h2>
     <p>Enter the password to continue</p>
     <input type="password" id="authPassword" placeholder="Password" onkeydown="if(event.key==='Enter')checkAuth()">
     <button class="auth-btn" onclick="checkAuth()">Enter</button>
@@ -424,7 +426,8 @@ body:not(.authenticated) .main-layout { display: none; }
 
 <div class="top-bar">
   <div class="top-bar-left">
-    <h1>Data Layer Workbench</h1>
+    <img src="favicon.ico" alt="Plantix" style="height:24px;width:24px;">
+    <h1>Plantix Data Intelligence Layers</h1>
     <span class="last-saved" id="lastSaved"></span>
   </div>
   <div class="top-bar-right">
@@ -2493,6 +2496,21 @@ function renderLayersHome(el) {
     </div>`;
   }
   html += '</div>';
+
+  html += `<div style="margin-top:48px;padding:28px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-bottom:16px;">Resources</div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;margin-bottom:24px;">
+      <a href="https://docs.google.com/document/d/1xtxwnpdph8GsIKrsdEwNvXHKzOmsaMzSJ2ROXnKDEUI/edit?tab=t.0#heading=h.wmybhf83v7kp" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">Roadshow User Stories from Sales ↗</a>
+      <a href="https://docs.google.com/spreadsheets/d/1N61gRkLo3RESMWoPJsY8XPZy5gF2OGwaD1YDmoMDpYI/edit?gid=1566468736#gid=1566468736" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">User Stories from User Research ↗</a>
+      <a href="https://github.com/PEAT-AI/Mosquito" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;font-weight:500;">Mosquito GitHub ↗</a>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-bottom:12px;">Process</div>
+    <div style="font-size:13px;color:#334155;line-height:1.7;">
+      Every Friday: user stories are updated from the documents, and Mosquito P0 issues are added.<br>
+      Monday morning: review session with Rob — priorities to be set to build the data layers.
+    </div>
+  </div>`;
+
   el.innerHTML = html;
 }
 
