@@ -1365,14 +1365,14 @@
     {
       "id": "prices-of-products",
       "name": "Prices of Products",
-      "icon": "$",
+      "icon": "🏷️",
       "notes": "",
       "tasks": []
     },
     {
       "id": "prices-of-commodities",
       "name": "Prices of Commodities",
-      "icon": "📄",
+      "icon": "📈",
       "notes": "",
       "tasks": []
     }
