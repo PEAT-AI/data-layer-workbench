@@ -2435,7 +2435,7 @@ function toggleNextUp() {
 function renderBreadcrumbs() {
   const bc = document.getElementById('breadcrumbs');
   if (currentView === 'nextup') { bc.innerHTML = '<span class="current">Next Up</span>'; return; }
-  if (currentView === 'overview') { bc.innerHTML = '<span class="current">Overview</span>'; return; }
+  if (currentView === 'overview') { bc.innerHTML = '<a onclick="navigate(1)">Data Layers</a><span class="sep">›</span><span class="current">Overview</span>'; return; }
   let html = '';
   if (currentLevel === 1) {
     html = '<span class="current">Data Layers</span>';
