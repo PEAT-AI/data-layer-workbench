@@ -111,7 +111,7 @@
       "id": "sd-1",
       "personaId": "seed",
       "role": "Sales / Marketing Head",
-      "text": "Know how much seed varieties to ship where — unsold stock becomes cow fodder",
+      "text": "Know how much seed varieties (maturity groups, e.g. 120-day vs 140-day rice) to ship where — unsold stock becomes cow fodder",
       "layers": [
         "acreage",
         "sowing-date"
@@ -586,6 +586,56 @@
       "layers": [],
       "tags": [
         "UX"
+      ]
+    },
+    {
+      "id": "fe-water-stress",
+      "personaId": "fertilizer",
+      "role": "Marketing Head",
+      "text": "As a Marketing Head at a bio-stimulant company, I want to understand when and where crops are experiencing water stress (flood or drought) so I can time and target my bio-stimulant campaigns to regions where plants need physical stress relief.",
+      "layers": [],
+      "tags": [
+        "Internal"
+      ]
+    },
+    {
+      "id": "fm-expenses",
+      "personaId": "farmer",
+      "role": "Farmer",
+      "text": "As a Farmer, I want to understand my expenses and ROI for each of my inputs (crop protection, fertilizer, seeds) so I can make better decisions about what to spend on and see which investments actually pay off.",
+      "layers": [],
+      "tags": [
+        "Internal"
+      ]
+    },
+    {
+      "id": "co-sown-area",
+      "personaId": "commodity",
+      "role": "Procurement Manager",
+      "text": "As a Procurement Manager, I want to understand the volatility in sown area early in the season so I can estimate which areas are suitable for procurement and adjust sourcing plans before harvest.",
+      "layers": [],
+      "tags": [
+        "Internal"
+      ]
+    },
+    {
+      "id": "co-outbreaks",
+      "personaId": "commodity",
+      "role": "Procurement Manager",
+      "text": "As a Procurement Manager, I want to know about major events and outbreaks throughout the season that might impact yield, decrease quality, or affect storage and shelf life — for example, toxic fungi in a region would make grains unsuitable for processing.",
+      "layers": [],
+      "tags": [
+        "Internal"
+      ]
+    },
+    {
+      "id": "co-growth-stage",
+      "personaId": "commodity",
+      "role": "Procurement Manager",
+      "text": "As a Procurement Manager, I want to know the crop growth stage so I can identify when the crop is close to harvest time and distribute field agents to make procurement deals with farmers.",
+      "layers": [],
+      "tags": [
+        "Internal"
       ]
     }
   ],
