@@ -995,7 +995,7 @@ const DATA = {
           "desc": "Predictive outbreak alerts"
         }
       ],
-      "notes": "",
+      "notes": "- DPI Historical Anomaly Score: compare current DPI to 5-year seasonal median to show \"150% above normal\" instead of just \"DPI = 60\" — makes the data actionable (Pedro)\n- Plantix ML growth stage classification from Thomas can calibrate disease pressure by actual crop stage via Bayesian blending (Pedro)",
       "tasks": [
         {
           "id": "t1",
@@ -1061,7 +1061,7 @@ const DATA = {
           "desc": "Subdistrict-level granularity"
         }
       ],
-      "notes": "Working on horticultural crops.",
+      "notes": "Working on horticultural crops.\n\n- GFSAD30 satellite-derived irrigation mapping at 30m via Google Earth Engine as alternative validation source (Pedro)",
       "tasks": [
         {
           "id": "t5",
@@ -1160,7 +1160,7 @@ const DATA = {
           "desc": "GDD-model integration"
         }
       ],
-      "notes": "Currently calendar-based. Photo-based detection being validated.",
+      "notes": "Currently calendar-based. Photo-based detection being validated.\n\n- ERA5 Growing Degree Days (GDD): replace static calendar with temperature-driven crop development. Crop base temperatures available for Rice, Cotton, Maize, Soybean, Wheat, Sorghum, Chickpea, Groundnut, Sugarcane (Pedro)\n- Plantix ML image phenology: Bayesian blend of observed stage (from classified photos) vs GDD-predicted stage, alpha scales with image count (min 50 for full trust) (Pedro)",
       "tasks": [
         {
           "id": "t9",
@@ -1235,7 +1235,7 @@ const DATA = {
           "desc": "Farm-level precision"
         }
       ],
-      "notes": "Good coverage via detection spike analysis. v1 validated for major crops.",
+      "notes": "Good coverage via detection spike analysis. v1 validated for major crops.\n\n- SMAP Soil Moisture as start-of-season trigger: SOS when surface soil moisture > 1.2× historical median. Replaces fixed ISO week assumption for rainfed crops (Pedro)\n- VIIRS Active Fire Detection: crop residue burning marks harvest completion → 20-30 day countdown to next sowing cycle. 375m resolution, <3h latency from NASA FIRMS (Pedro)",
       "tasks": [
         {
           "id": "t12",
@@ -1295,7 +1295,7 @@ const DATA = {
           "desc": "Hyperlocal weather stations"
         }
       ],
-      "notes": "Solid external data source. API pipeline stable.",
+      "notes": "Solid external data source. API pipeline stable.\n\n- ERA5-Land reanalysis: daily 2m max/min temperature, 9km resolution, via GEE — needed for GDD computation (Pedro)\n- CHIRPS Precipitation: drought mortality penalty when 4-week rainfall is 60%+ below normal, 5.5km resolution (Pedro)\n- SMAP Soil Moisture: 10km daily surface soil moisture, 2015-present (Pedro)",
       "tasks": [
         {
           "id": "t15",
@@ -1354,7 +1354,7 @@ const DATA = {
           "desc": "Individual farmer scoring"
         }
       ],
-      "notes": "Currently a derived proxy. Needs sales data integration for validation.",
+      "notes": "Currently a derived proxy. Needs sales data integration for validation.\n\n- Mandi Commodity Prices (Agmarknet): farmer willingness to spend correlates with crop prices — Rs 200/kg chilli → premium products; Rs 50/kg → skip spraying or cheap generics (Pedro)\n- PM-KISAN Disbursal Timing: Rs 2,000 deposited 3×/year — the week money arrives is when retailers see input purchase spikes (Pedro)\n- Fertilizer Point-of-Sale (eUrvarak): block-level fertilizer purchase data as best proxy for farming intensity. Portal at urvarak.nic.in but fragile scraping (Pedro)",
       "tasks": [
         {
           "id": "t18",
@@ -1401,7 +1401,7 @@ const DATA = {
           "desc": "Efficacy-scored recommendations"
         }
       ],
-      "notes": "Well-established. v2 needs field trial data.",
+      "notes": "Well-established. v2 needs field trial data.\n\n- Irrigation status affects treatment type: irrigated farmers prefer premium liquid formulations and spray 50-100% more frequently with prophylactic schedules; rainfed farmers spray reactively with broad-spectrum generics (Pedro)",
       "tasks": [
         {
           "id": "t21",
@@ -1480,7 +1480,7 @@ const DATA = {
           "desc": "Real-time demand dashboard"
         }
       ],
-      "notes": "Earliest stage. Depends on Disease Incidences + Acreage + Growth Stage being solid.",
+      "notes": "Earliest stage. Depends on Disease Incidences + Acreage + Growth Stage being solid.\n\n- CHIRPS drought mortality penalty: multiply standing_crop_ha by drought_penalty (floor 0.2) when cumulative rainfall is severely below normal (Pedro)\n- Irrigation modifier on spray adoption: effective_adoption = base_adoption × (1.0 + irrigated_fraction × 0.5) (Pedro)\n- Mandi Arrival Volumes (Agmarknet): high arrivals at stable/rising prices = cash injection → input purchases within 1-2 weeks (Pedro)",
       "tasks": [
         {
           "id": "t24",
@@ -1553,7 +1553,7 @@ const DATA = {
           "desc": "Sales × detection correlation"
         }
       ],
-      "notes": "Blocked on partner data sharing agreements. Critical for Farmer Value validation.",
+      "notes": "Blocked on partner data sharing agreements. Critical for Farmer Value validation.\n\n- Agri-Retailer Geospatial Density via Google Places API: map retailer clusters to know where to send sales reps. ~15 shops along a highway turns a polygon into a routing instruction (Pedro)",
       "tasks": [
         {
           "id": "t27",
@@ -1610,7 +1610,7 @@ const DATA = {
           "desc": "Dynamic calendar from detections"
         }
       ],
-      "notes": "Stable foundation. Powers Growth Stage and Sowing Date layers.",
+      "notes": "Stable foundation. Powers Growth Stage and Sowing Date layers.\n\n- VIIRS Active Fire Detection: harvest completion with daily precision from residue burning, starts countdown to next sowing. Concentrated in Punjab, Haryana, UP, MP (Pedro)\n- GDD-based lifecycle stages to replace fixed ISO week definitions (Pedro)",
       "tasks": [
         {
           "id": "t30",
@@ -1670,7 +1670,7 @@ const DATA = {
           "desc": "Plantix detection prevalence data per geography"
         }
       ],
-      "notes": "Narrows TAM down to SOM — the share that reflects real purchasing behaviour. Not all farmers who face a treatable disease actually spray. Like pharma \"treatment rate\" — not all diagnosed patients get treated.",
+      "notes": "Narrows TAM down to SOM — the share that reflects real purchasing behaviour. Not all farmers who face a treatable disease actually spray. Like pharma \"treatment rate\" — not all diagnosed patients get treated.\n\n- Plantix Anxiety Index: session length × search count from app telemetry — when it spikes, farmers are actively researching solutions and more likely to buy premium (Pedro)\n- In-App Farmer Questionnaires: 1 question per session during photo analysis loading. Top questions: crop age, seed brand, last spray product, did spray work, irrigation source (Pedro)\n- Commodity price correlation: when crop prices crash, farmers revert to cheap generics and reduce spend (Pedro)",
       "tasks": [
         {
           "id": "fb-1",
@@ -1810,7 +1810,7 @@ const DATA = {
       "id": "prices-of-commodities",
       "name": "Prices of Commodities",
       "icon": "📈",
-      "notes": "",
+      "notes": "- Agmarknet (agmarknet.gov.in): daily modal prices and arrival volumes per mandi, ~7,000 mandis. Formula: price_anomaly_pct = (current_price / 5yr_median) - 1.0 (Pedro)",
       "tasks": [],
       "dataLinks": [
         {
@@ -1830,14 +1830,14 @@ const DATA = {
       "id": "irrigation-status",
       "name": "Irrigation Status",
       "icon": "🚿",
-      "notes": "",
+      "notes": "- DES Land Use Statistics: % irrigated net sown area per district per crop, annual, free public data (Pedro)\n- GFSAD30: satellite-derived irrigation mapping at 30m via Google Earth Engine (Pedro)\n- In-app farmer questionnaire: \"How do you water this field?\" with visual icons (rain/borewell/canal) (Pedro)",
       "tasks": []
     },
     {
       "id": "soil",
       "name": "Soil",
       "icon": "🪨",
-      "notes": "",
+      "notes": "- SoilGrids 2.0 (ISRIC): 250m resolution soil property maps — sand/clay/silt, organic carbon, pH, CEC. Free, CC BY 4.0 via soilgrids.org (Pedro)\n- Soil Health Card portal (soilhealth.dac.gov.in): block-level NPK and micronutrient deficiency %. Updated every 2-3 year testing cycle. Data often stale (2017-2019) (Pedro)",
       "tasks": []
     }
   ],
