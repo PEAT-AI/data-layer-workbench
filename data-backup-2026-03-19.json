@@ -612,7 +612,7 @@
           "desc": "Predictive outbreak alerts"
         }
       ],
-      "notes": "Core layer — feeds the most use cases. Dependent on detection model accuracy.",
+      "notes": "",
       "tasks": [
         {
           "id": "t1",
@@ -637,7 +637,24 @@
           "next": false,
           "assignee": ""
         }
-      ]
+      ],
+      "links": [
+        {
+          "label": "Doc",
+          "url": "https://docs.google.com/document/d/1VqZyLjBAuKTN5EfEwv0o3dMOkviZhcC8vvmYEC-cHgY/edit?tab=t.0#heading=h.fqgn5ab3ms4u"
+        }
+      ],
+      "dataLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "BQ table",
+          "url": "https://console.cloud.google.com/bigquery?project=plantix-8e0ce&ws=!1m5!1m4!4m3!1splantix-8e0ce!2sdata_solutions_prod!3sdisease_alerts"
+        }
+      ],
+      "overview": "  Core Calculation (3 dbt SQL files)                                                                                                                                                                                                             \n                                                                                                                                                                                                                                                 \n  1. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_base.sql (535 lines)                                                                                                                                                  \n    - Aggregates health check data over 30-day window                                                                                                                                                                                            \n    - Calculates rolling 7-day weighted disease counts (weighted by inverse of host crops per EPPO code)                                                                                                                                         \n    - Computes frac_disease_7d = disease fraction of crop                                                                                                                                                                                        \n    - Detects daily/weekly percentage changes with dynamic thresholds (90th percentile)                                                                                                                                                          \n  2. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_scores.sql (199 lines)                                                                                                                                                \n    - Classifies incidence: HIGH (>30%), MEDIUM (>10%), LOW (≤10%)                                                                                                                                                                               \n    - Classifies trend: UP/DOWN/STABLE based on weekly change vs dynamic threshold                                                                                                                                                               \n    - Computes alert level (HIGH/MEDIUM/LOW) from incidence × trend matrix                                                                                                                                                                       \n    - Applies management options logic (upgrades if preventive-only treatment)                                                                                                                                                                   \n    - Applies damage score logic (upgrades/downgrades based on economic damage)                                                                                                                                                                  \n    - Adds confidence scores and season strength                                                                                                                                                                                                 \n  3. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_thresholds.sql (188 lines)                                                                                                                                            \n    - Percentile-based thresholds (p20-p50) for filtering                                                                                                                                                                                        \n                                                                                                                                                                                                                                                 \n  Supporting macros\n                                                                                                                                                                                                                                                 \n  - dbt_project/macros/disease_alerts_states.sql — eligible Indian states (12)                                                                                                                                                                   \n  - dbt_project/macros/disease_alerts_crops.sql — eligible crops + seasonality (Kharif/Rabi)\n                                                                                                                                                                                                                                                 \n  Dagster orchestration\n                                                                                                                                                                                                                                                 \n  - dagster_dp/customers/syngenta_disease_alerts.py — daily run, publishes to S3 on Mon/Thu                                                                                                                                                      \n  \n  Distribution layer                                                                                                                                                                                                                             \n                  \n  - disease_alerts_report_data.sql → email/sheets                                                                                                                                                                                                \n  - disease_alerts_lizard.sql / _v2.sql → Lizard system\n  - disease_alerts_ppp.sql / disease_alerts_product.sql → pesticide recommendations                                                                                                                                                              \n  - disease_alerts_data_whatsapp.sql → WhatsApp messages                                                                                                                                                                                         \n  \n"
     },
     {
       "id": "acreage",
@@ -661,7 +678,7 @@
           "desc": "Subdistrict-level granularity"
         }
       ],
-      "notes": "Combines government data with satellite validation. Key gap: subdistrict granularity. We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)",
+      "notes": "Working on horticultural crops.",
       "tasks": [
         {
           "id": "t5",
@@ -729,7 +746,14 @@
           "next": true,
           "assignee": "Plantix App"
         }
-      ]
+      ],
+      "dataLinks": [
+        {
+          "label": "BQ link for acreage UPAG",
+          "url": "plantix-8e0ce.data_solutions_prod.stg_upag_crop_statistics"
+        }
+      ],
+      "overview": "Acreage data from UPAG + cropland to go down to subdistrict level. We assume the distribution of crops in subdistricts is equally distributed.  We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)"
     },
     {
       "id": "growth-stage",
@@ -786,6 +810,23 @@
           "done": false,
           "next": true,
           "assignee": "Andjela to discuss with Thomas"
+        }
+      ],
+      "overview": "We have different directions in order to get to the growth stage. \n1. The first approach is to have a vision-based growth stage using the BBCH scale. We are working with the following crops: soybean, cotton, rice, maize, and we are exploring adding horticultural crops as well. The expectation for a new crop is from two to five days to add on the model. \n2. We are also working on deriving growth stage using the sowing date and the maturity type from a Plantix Farmer app. \n3. If we don't have any of the above, then we are going back to estimating the monsoon start, the sowing, and the average maturity to then define the different crop stages. ",
+      "dataLinks": [
+        {
+          "label": "WIP Vision Based Growth stage BQ",
+          "url": "https://console.cloud.google.com/bigquery?project=plantix-8e0ce&ws=!1m5!1m4!4m3!1splantix-8e0ce!2scaterpillar!3sgrowth_stage_predictions"
+        }
+      ],
+      "links": [
+        {
+          "label": "Link to MM explanation",
+          "url": "https://chat.peat-cloud.com/peat/pl/8wzm5hogttfqpcbgmkw5fewaew"
+        },
+        {
+          "label": "Link to Demo",
+          "url": "https://d2aqfnzdlu8tb9.cloudfront.net/"
         }
       ]
     },
@@ -1092,6 +1133,19 @@
           "next": false,
           "assignee": ""
         }
+      ],
+      "dataLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/PEAT-AI/cicada"
+        }
+      ],
+      "overview": "  Cicada is a Bayesian disease outbreak forecasting system that predicts agricultural disease pressure 1–3 months ahead across 17 Indian states and 3 crops (MAIZE, RICE, COTTON).                                                               \n            \n Training Data                                                                                                                                                                                                                                  \n                                                                                                                                                                                                                                                 \n  - Weekly disease detection counts & total scan counts per state/crop/peat_id, filtered to feedforward_integer >= 3 and dates from 2021 onwards (plantix-8e0ce.data_solutions_prod.health_check_validated)                                      \n  - Disease name → peat_id mapping, filtered to disease/pest classes (plantix-8e0ce.data_solutions_prod.dingo_disease_master)                                                                                                                    \n  - Monsoon onset week per IMD subdivision per year — only for monsoon-aware models (plantix-8e0ce.data_solutions_prod.sw_monsoon_dates)                                                                                                         \n                                                                                                                                                                                                                                                 \n  External Validation Data                                                                                                                                                                                                                       \n                                                                                                                                                                                                                                                 \n  - AAS outbreak/alert event counts by week — all states/crops (plantix-8e0ce.sync_dlt_local.gcs_seeds__aas_{crop}_disease_outbreaks, joined with gcs_seeds__aas_districts and gcs_seeds__aas_disease_peat_mapping)                              \n  - PestDSS ETL threshold observations — Maharashtra only (plantix-8e0ce.sync_dlt_local.gcs_seeds__pestdss_etl_observations)\n  - Manual outbreak presence annotations — AP/Telangana rice only (plantix-8e0ce.sync_dlt_local.gcs_seeds__kharif_rabi_outbreak_annotations)     \n\n                                                                                                                                                                                                                                     \n  End-to-End Pipeline                                                                                                                                                                                                                            \n                                                                                                                                                                                                                                                 \n  1. Data ingestion from BigQuery (read-only)                                                                                                                                                                                                    \n  2. Model training — 6 Bayesian/statistical models (Seasonal Naive, Fourier AR(1), ZI-Fourier AR(1), Monsoon AR(1), ZI-Monsoon AR(1), Prophet)                                                                                                  \n  3. Evaluation — 6-fold expanding-window cross-validation (WIS, calibration, MAE)                                                                                                                                                               \n  4. External validation — against AAS, PestDSS, and manual annotations                                                                                                                                                                          \n  5. Forward forecasting — trains on all data, predicts 13+ weeks ahead                                                                                                                                                                          \n  6. Output — local CSV/JSON/Markdown + optional ClearML logging\n                                                                                                                                                                                                                                                 \n  Validation phase split: year < 2025 = validation, year >= 2025 = held-out test.  ",
+      "links": [
+        {
+          "label": "asana",
+          "url": "https://app.asana.com/1/1162751913058161/task/1213538609591741?focus=true"
+        }
       ]
     },
     {
@@ -1374,10 +1428,23 @@
       "name": "Prices of Commodities",
       "icon": "📈",
       "notes": "",
-      "tasks": []
+      "tasks": [],
+      "dataLinks": [
+        {
+          "label": "BQ Magpie Prices",
+          "url": "https://console.cloud.google.com/bigquery?project=plantix-8e0ce&ws=!1m5!1m4!4m3!1splantix-8e0ce!2smagpie!3scommodity_prices"
+        }
+      ],
+      "links": [
+        {
+          "label": "Mandi Prices Asana Ticket",
+          "url": "https://app.asana.com/1/1162751913058161/task/1209650586704215?focus=true"
+        }
+      ],
+      "overview": "We identified and loaded the mandi prices already"
     }
   ],
-  "lastSaved": "2026-03-20T12:23:01.908Z",
+  "lastSaved": "2026-03-20T13:23:29.806Z",
   "availableTags": [
     "Sales",
     "UX",
