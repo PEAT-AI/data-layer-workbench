@@ -1961,6 +1961,7 @@ function loadState() {
           for (const t of l.tasks) {
             if (t.next === undefined) t.next = false;
             if (t.assignee === undefined) t.assignee = '';
+            if (t.asanaUrl === undefined) t.asanaUrl = '';
           }
         }
         // Migrate: add farmer persona if missing
@@ -2025,6 +2026,10 @@ function navigate(level, opts = {}) {
   }, 150);
 }
 
+function navigatePersonas() {
+  navigate('personas');
+}
+
 function toggleNextUp() {
   const btn = document.getElementById('nextUpBtn');
   if (currentView === 'nextup') {
@@ -2042,16 +2047,15 @@ function renderBreadcrumbs() {
   if (currentView === 'nextup') { bc.innerHTML = '<span class="current">Next Up</span>'; return; }
   let html = '';
   if (currentLevel === 1) {
-    html = '<span class="current">Personas</span>';
+    html = '<span class="current">Data Layers</span>';
+  } else if (currentLevel === 'personas') {
+    html = '<a onclick="navigate(1)">Data Layers</a><span class="sep">›</span><span class="current">Personas</span>';
   } else if (currentLevel === 2) {
     const p = state.personas.find(p => p.id === selectedPersona);
-    html = `<a onclick="navigate(1)">Personas</a><span class="sep">›</span><span class="current">${p ? p.icon + ' ' + p.name : ''}</span>`;
+    html = `<a onclick="navigate(1)">Data Layers</a><span class="sep">›</span><a onclick="navigatePersonas()">Personas</a><span class="sep">›</span><span class="current">${p ? p.icon + ' ' + p.name : ''}</span>`;
   } else if (currentLevel === 3) {
-    const p = state.personas.find(p => p.id === selectedPersona);
     const l = state.layers.find(l => l.id === selectedLayer);
-    html = `<a onclick="navigate(1)">Personas</a><span class="sep">›</span>`;
-    if (selectedPersona) html += `<a onclick="navigate(2, {personaId:'${selectedPersona}'})">${p ? p.icon + ' ' + p.name : ''}</a><span class="sep">›</span>`;
-    html += `<span class="current">${l ? l.icon + ' ' + l.name : ''}</span>`;
+    html = `<a onclick="navigate(1)">Data Layers</a><span class="sep">›</span><span class="current">${l ? l.icon + ' ' + l.name : ''}</span>`;
   }
   bc.innerHTML = html;
 }
@@ -2062,12 +2066,40 @@ function renderBreadcrumbs() {
 function renderContent() {
   const el = document.getElementById('content');
   if (currentView === 'nextup') { renderNextUp(el); return; }
-  if (currentLevel === 1) renderLevel1(el);
+  if (currentLevel === 1) renderLayersHome(el);
   else if (currentLevel === 2) renderLevel2(el);
   else if (currentLevel === 3) renderLevel3(el);
+  else if (currentLevel === 'personas') renderPersonasList(el);
 }
 
-function renderLevel1(el) {
+function renderLayersHome(el) {
+  const sortedLayers = [...state.layers].sort((a, b) => {
+    const countA = state.useCases.filter(u => u.layers.includes(a.id)).length;
+    const countB = state.useCases.filter(u => u.layers.includes(b.id)).length;
+    return countB - countA;
+  });
+  let html = '<div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">';
+  for (const layer of sortedLayers) {
+    const ucCount = state.useCases.filter(u => u.layers.includes(layer.id)).length;
+    const nextCount = layer.tasks.filter(t => t.next && !t.done).length;
+    const openCount = layer.tasks.filter(t => !t.done && !t.next).length;
+    const doneCount = layer.tasks.filter(t => t.done).length;
+    html += `<div class="card" onclick="navigate(3, {layerId:'${layer.id}'})">
+      <div style="font-size:32px;margin-bottom:12px;">${layer.icon}</div>
+      <div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:4px;">${escHtml(layer.name)}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px;">${ucCount} use case${ucCount !== 1 ? 's' : ''}</div>
+      <div style="display:flex;gap:12px;font-size:11px;">
+        ${nextCount > 0 ? `<span style="color:#2563eb;font-weight:600;">${nextCount} next</span>` : ''}
+        ${openCount > 0 ? `<span style="color:#64748b;">${openCount} open</span>` : ''}
+        ${doneCount > 0 ? `<span style="color:#94a3b8;">${doneCount} done</span>` : ''}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderPersonasList(el) {
   let html = '<div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">';
   for (const p of state.personas) {
     const cases = state.useCases.filter(u => u.personaId === p.id);
@@ -2155,9 +2187,35 @@ function renderLevel3(el) {
       <span class="layer-icon">${layer.icon}</span>
       <span class="layer-name">${escHtml(layer.name)}</span>
     </div>
+    <div class="section-title">Overview</div>
+    <textarea class="notes-area" style="min-height:80px;" onblur="updateLayerField('${layer.id}', 'overview', this.value)">${escHtml(layer.overview || '')}</textarea>
+
     <div class="section-title">Notes</div>
     <textarea class="notes-area" onblur="updateLayerNotes('${layer.id}', this.value)">${escHtml(layer.notes || '')}</textarea>
-    <div class="section-title">Where is this used? — ${totalPersonas} persona${totalPersonas !== 1 ? 's' : ''}, ${totalCases} use case${totalCases !== 1 ? 's' : ''}</div>
+
+    <div class="section-title">Documents & Links</div>
+    <div class="link-list">
+      ${(layer.links || []).map((link, li) => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <a href="${escHtml(link.url)}" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(link.label || link.url)} ↗</a>
+          <button class="task-delete" onclick="removeLink('${layer.id}', ${li})" title="Remove link">✕</button>
+        </div>
+      `).join('')}
+    </div>
+    <button class="add-btn" onclick="showAddLinkModal('${layer.id}')">+ Add link</button>
+
+    <div class="section-title" style="margin-top:28px;">BigQuery / Data Sources</div>
+    <div class="link-list">
+      ${(layer.dataLinks || []).map((link, li) => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <a href="${escHtml(link.url)}" target="_blank" style="font-size:13px;color:#2563eb;text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(link.label || link.url)} ↗</a>
+          <button class="task-delete" onclick="removeDataLink('${layer.id}', ${li})" title="Remove link">✕</button>
+        </div>
+      `).join('')}
+    </div>
+    <button class="add-btn" onclick="showAddDataLinkModal('${layer.id}')">+ Add data link</button>
+
+    <div class="section-title" style="margin-top:28px;">Where is this used? — ${totalPersonas} persona${totalPersonas !== 1 ? 's' : ''}, ${totalCases} use case${totalCases !== 1 ? 's' : ''}</div>
     <div class="reverse-links">
       ${Object.values(reverseLinks).map(g => `
         <div class="reverse-link-group">
@@ -2166,11 +2224,21 @@ function renderLevel3(el) {
         </div>
       `).join('')}
     </div>
-    <div class="section-title">Tasks</div>
-    <div class="task-list">
-      ${layer.tasks.map((t, i) => renderTask(layer.id, t, i)).join('')}
-    </div>
-    <button class="add-btn" onclick="addTask('${layer.id}')">+ Add task</button>
+    ${(() => {
+      const nextTasks = layer.tasks.map((t, i) => ({t, i})).filter(({t}) => t.next && !t.done);
+      const openTasks = layer.tasks.map((t, i) => ({t, i})).filter(({t}) => !t.next && !t.done);
+      const doneTasks = layer.tasks.map((t, i) => ({t, i})).filter(({t}) => t.done);
+      let sections = '';
+      if (nextTasks.length > 0) {
+        sections += `<div class="section-title">Next (${nextTasks.length})</div><div class="task-list">${nextTasks.map(({t, i}) => renderTask(layer.id, t, i)).join('')}</div>`;
+      }
+      sections += `<div class="section-title">Open (${openTasks.length})</div><div class="task-list">${openTasks.map(({t, i}) => renderTask(layer.id, t, i)).join('')}</div>`;
+      sections += `<button class="add-btn" onclick="addTask('${layer.id}')">+ Add task</button>`;
+      if (doneTasks.length > 0) {
+        sections += `<div class="section-title" style="margin-top:32px;">Completed (${doneTasks.length})</div><div class="task-list">${doneTasks.map(({t, i}) => renderTask(layer.id, t, i)).join('')}</div>`;
+      }
+      return sections;
+    })()}
   </div>`;
   el.innerHTML = html;
 }
@@ -2180,18 +2248,22 @@ function renderTask(layerId, task, idx) {
     <div class="task-checkbox ${task.done ? 'checked' : ''}" onclick="toggleTask('${layerId}', ${idx})"></div>
     <div class="task-content">
       <div class="task-desc" contenteditable="true"
-           onblur="updateTaskDesc('${layerId}', ${idx}, this.textContent)"
-           style="${task.done ? 'text-decoration: line-through; color: #94a3b8;' : ''}">${escHtml(task.desc)}</div>
+           onblur="updateTaskDesc('${layerId}', ${idx}, this.textContent)">${escHtml(task.desc)}</div>
       <div class="task-meta">
         ${renderSourcePill(layerId, idx, 'plantix', '🌱 Plantix', task.sources)}
         ${renderSourcePill(layerId, idx, 'external', '🌍 External', task.sources)}
         ${renderSourcePill(layerId, idx, 'derived', '🔧 Derived', task.sources)}
         <span class="next-toggle ${task.next ? 'active' : ''}" onclick="toggleNext('${layerId}', ${idx})">Next</span>
       </div>
-      <div style="margin-top:6px;">
-        <input class="assignee-input" type="text" placeholder="Assignee — who's on this?"
+      <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input class="assignee-input" type="text" placeholder="Assignee"
                value="${escHtml(task.assignee || '')}"
                onchange="updateAssignee('${layerId}', ${idx}, this.value)">
+        <input class="assignee-input" type="url" placeholder="Asana link"
+               value="${escHtml(task.asanaUrl || '')}"
+               onchange="updateAsanaUrl('${layerId}', ${idx}, this.value)"
+               style="width:220px;">
+        ${task.asanaUrl ? `<a href="${escHtml(task.asanaUrl)}" target="_blank" style="font-size:11px;color:#2563eb;text-decoration:none;font-weight:500;">Open ticket ↗</a>` : ''}
       </div>
     </div>
     <div class="task-actions">
@@ -2281,6 +2353,15 @@ function renderSidebar() {
     </div>`;
   }
   html += `<button class="add-btn" style="width:100%;margin-top:12px;justify-content:center;" onclick="showAddLayerModal()">+ New Layer</button>`;
+  html += `<div class="sidebar-title" style="margin-top:24px;">Personas</div>`;
+  for (const p of state.personas) {
+    const isActive = currentLevel === 2 && selectedPersona === p.id;
+    const caseCount = state.useCases.filter(u => u.personaId === p.id).length;
+    html += `<div class="sidebar-layer ${isActive ? 'active' : ''}" onclick="navigate(2, {personaId:'${p.id}'})">
+      <span class="icon">${p.icon}</span>
+      <span class="name">${p.name} <span style="color:#94a3b8;font-weight:400;">(${caseCount})</span></span>
+    </div>`;
+  }
   sb.innerHTML = html;
 }
 
@@ -2295,6 +2376,75 @@ function updateStoryText(ucId, text) {
 function updateLayerNotes(layerId, text) {
   const layer = state.layers.find(l => l.id === layerId);
   if (layer) { layer.notes = text; saveState(); }
+}
+
+function updateLayerField(layerId, field, value) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer) { layer[field] = value; saveState(); }
+}
+
+function removeLink(layerId, idx) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.links) { layer.links.splice(idx, 1); saveState(); renderContent(); }
+}
+
+function showAddLinkModal(layerId) {
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <h3>Add Link</h3>
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Label</label>
+    <input type="text" id="newLinkLabel" placeholder="e.g. TAM Factors Doc" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">URL</label>
+    <input type="url" id="newLinkUrl" placeholder="https://..." style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveNewLink('${layerId}')">Add</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function removeDataLink(layerId, idx) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.dataLinks) { layer.dataLinks.splice(idx, 1); saveState(); renderContent(); }
+}
+
+function showAddDataLinkModal(layerId) {
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <h3>Add Data Link</h3>
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Label</label>
+    <input type="text" id="newDataLinkLabel" placeholder="e.g. disease_incidences_weekly table" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">URL</label>
+    <input type="url" id="newDataLinkUrl" placeholder="https://console.cloud.google.com/bigquery?..." style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveNewDataLink('${layerId}')">Add</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function saveNewDataLink(layerId) {
+  const label = document.getElementById('newDataLinkLabel').value.trim();
+  const url = document.getElementById('newDataLinkUrl').value.trim();
+  if (!url) return;
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer) {
+    if (!layer.dataLinks) layer.dataLinks = [];
+    layer.dataLinks.push({ label: label || url, url });
+    saveState(); closeModal(); renderContent();
+  }
+}
+
+function saveNewLink(layerId) {
+  const label = document.getElementById('newLinkLabel').value.trim();
+  const url = document.getElementById('newLinkUrl').value.trim();
+  if (!url) return;
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer) {
+    if (!layer.links) layer.links = [];
+    layer.links.push({ label: label || url, url });
+    saveState(); closeModal(); renderContent();
+  }
 }
 
 function toggleTask(layerId, idx) {
@@ -2324,6 +2474,11 @@ function updateAssignee(layerId, idx, name) {
   if (layer && layer.tasks[idx]) { layer.tasks[idx].assignee = name.trim(); saveState(); }
 }
 
+function updateAsanaUrl(layerId, idx, url) {
+  const layer = state.layers.find(l => l.id === layerId);
+  if (layer && layer.tasks[idx]) { layer.tasks[idx].asanaUrl = url.trim(); saveState(); renderContent(); }
+}
+
 function toggleSource(layerId, idx, source) {
   const layer = state.layers.find(l => l.id === layerId);
   if (!layer || !layer.tasks[idx]) return;
@@ -2342,7 +2497,7 @@ function deleteTask(layerId, idx) {
 function addTask(layerId) {
   const layer = state.layers.find(l => l.id === layerId);
   if (layer) {
-    layer.tasks.push({ id: 't' + Date.now(), desc: 'New task', sources: ['plantix'], done: false, next: false, assignee: '' });
+    layer.tasks.push({ id: 't' + Date.now(), desc: 'New task', sources: ['plantix'], done: false, next: false, assignee: '', asanaUrl: '' });
     saveState(); renderContent();
   }
 }
