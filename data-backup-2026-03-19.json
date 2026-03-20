@@ -1442,6 +1442,20 @@
         }
       ],
       "overview": "We identified and loaded the mandi prices already"
+    },
+    {
+      "id": "irrigation-status",
+      "name": "Irrigation Status",
+      "icon": "🚿",
+      "notes": "",
+      "tasks": []
+    },
+    {
+      "id": "soil",
+      "name": "Soil",
+      "icon": "🪨",
+      "notes": "",
+      "tasks": []
     }
   ],
   "lastSaved": "2026-03-20T13:23:29.806Z",
