@@ -1160,7 +1160,8 @@ const DATA = {
           "url": "https://console.cloud.google.com/bigquery?project=plantix-8e0ce&ws=!1m5!1m4!4m3!1splantix-8e0ce!2sdata_solutions_prod!3sdisease_alerts"
         }
       ],
-      "overview": "  Core Calculation (3 dbt SQL files)                                                                                                                                                                                                             \n                                                                                                                                                                                                                                                 \n  1. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_base.sql (535 lines)                                                                                                                                                  \n    - Aggregates health check data over 30-day window                                                                                                                                                                                            \n    - Calculates rolling 7-day weighted disease counts (weighted by inverse of host crops per EPPO code)                                                                                                                                         \n    - Computes frac_disease_7d = disease fraction of crop                                                                                                                                                                                        \n    - Detects daily/weekly percentage changes with dynamic thresholds (90th percentile)                                                                                                                                                          \n  2. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_scores.sql (199 lines)                                                                                                                                                \n    - Classifies incidence: HIGH (>30%), MEDIUM (>10%), LOW (≤10%)                                                                                                                                                                               \n    - Classifies trend: UP/DOWN/STABLE based on weekly change vs dynamic threshold                                                                                                                                                               \n    - Computes alert level (HIGH/MEDIUM/LOW) from incidence × trend matrix                                                                                                                                                                       \n    - Applies management options logic (upgrades if preventive-only treatment)                                                                                                                                                                   \n    - Applies damage score logic (upgrades/downgrades based on economic damage)                                                                                                                                                                  \n    - Adds confidence scores and season strength                                                                                                                                                                                                 \n  3. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_thresholds.sql (188 lines)                                                                                                                                            \n    - Percentile-based thresholds (p20-p50) for filtering                                                                                                                                                                                        \n                                                                                                                                                                                                                                                 \n  Supporting macros\n                                                                                                                                                                                                                                                 \n  - dbt_project/macros/disease_alerts_states.sql — eligible Indian states (12)                                                                                                                                                                   \n  - dbt_project/macros/disease_alerts_crops.sql — eligible crops + seasonality (Kharif/Rabi)\n                                                                                                                                                                                                                                                 \n  Dagster orchestration\n                                                                                                                                                                                                                                                 \n  - dagster_dp/customers/syngenta_disease_alerts.py — daily run, publishes to S3 on Mon/Thu                                                                                                                                                      \n  \n  Distribution layer                                                                                                                                                                                                                             \n                  \n  - disease_alerts_report_data.sql → email/sheets                                                                                                                                                                                                \n  - disease_alerts_lizard.sql / _v2.sql → Lizard system\n  - disease_alerts_ppp.sql / disease_alerts_product.sql → pesticide recommendations                                                                                                                                                              \n  - disease_alerts_data_whatsapp.sql → WhatsApp messages                                                                                                                                                                                         \n  \n"
+      "overview": "  Core Calculation (3 dbt SQL files)                                                                                                                                                                                                             \n                                                                                                                                                                                                                                                 \n  1. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_base.sql (535 lines)                                                                                                                                                  \n    - Aggregates health check data over 30-day window                                                                                                                                                                                            \n    - Calculates rolling 7-day weighted disease counts (weighted by inverse of host crops per EPPO code)                                                                                                                                         \n    - Computes frac_disease_7d = disease fraction of crop                                                                                                                                                                                        \n    - Detects daily/weekly percentage changes with dynamic thresholds (90th percentile)                                                                                                                                                          \n  2. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_scores.sql (199 lines)                                                                                                                                                \n    - Classifies incidence: HIGH (>30%), MEDIUM (>10%), LOW (≤10%)                                                                                                                                                                               \n    - Classifies trend: UP/DOWN/STABLE based on weekly change vs dynamic threshold                                                                                                                                                               \n    - Computes alert level (HIGH/MEDIUM/LOW) from incidence × trend matrix                                                                                                                                                                       \n    - Applies management options logic (upgrades if preventive-only treatment)                                                                                                                                                                   \n    - Applies damage score logic (upgrades/downgrades based on economic damage)                                                                                                                                                                  \n    - Adds confidence scores and season strength                                                                                                                                                                                                 \n  3. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_thresholds.sql (188 lines)                                                                                                                                            \n    - Percentile-based thresholds (p20-p50) for filtering                                                                                                                                                                                        \n                                                                                                                                                                                                                                                 \n  Supporting macros\n                                                                                                                                                                                                                                                 \n  - dbt_project/macros/disease_alerts_states.sql — eligible Indian states (12)                                                                                                                                                                   \n  - dbt_project/macros/disease_alerts_crops.sql — eligible crops + seasonality (Kharif/Rabi)\n                                                                                                                                                                                                                                                 \n  Dagster orchestration\n                                                                                                                                                                                                                                                 \n  - dagster_dp/customers/syngenta_disease_alerts.py — daily run, publishes to S3 on Mon/Thu                                                                                                                                                      \n  \n  Distribution layer                                                                                                                                                                                                                             \n                  \n  - disease_alerts_report_data.sql → email/sheets                                                                                                                                                                                                \n  - disease_alerts_lizard.sql / _v2.sql → Lizard system\n  - disease_alerts_ppp.sql / disease_alerts_product.sql → pesticide recommendations                                                                                                                                                              \n  - disease_alerts_data_whatsapp.sql → WhatsApp messages                                                                                                                                                                                         \n  \n",
+      "priority": "high"
     },
     {
       "id": "acreage",
@@ -1184,7 +1185,7 @@ const DATA = {
           "desc": "Subdistrict-level granularity"
         }
       ],
-      "notes": "Working on horticultural crops.\n\n- GFSAD30 satellite-derived irrigation mapping at 30m via Google Earth Engine as alternative validation source (Pedro)",
+      "notes": "23/3/2026 can we get some more information on the production of major horticulture crops the areas that produce ? Can we also try to build crop maps with satellite data? (pomegranate, chillies) Can we find a way to correlate or use our own data and density and join the signals. \n\n\nWorking on horticultural crops.\n\n- GFSAD30 satellite-derived irrigation mapping at 30m via Google Earth Engine as alternative validation source (Pedro)",
       "tasks": [
         {
           "id": "t5",
@@ -1259,7 +1260,8 @@ const DATA = {
           "url": "plantix-8e0ce.data_solutions_prod.stg_upag_crop_statistics"
         }
       ],
-      "overview": "Acreage data from UPAG + cropland to go down to subdistrict level. We assume the distribution of crops in subdistricts is equally distributed.  We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)"
+      "overview": "Acreage data from UPAG + cropland to go down to subdistrict level. We assume the distribution of crops in subdistricts is equally distributed.  We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)",
+      "priority": "high"
     },
     {
       "id": "growth-stage",
@@ -1346,7 +1348,8 @@ const DATA = {
           "label": "Link to Demo",
           "url": "https://d2aqfnzdlu8tb9.cloudfront.net/"
         }
-      ]
+      ],
+      "priority": "high"
     },
     {
       "id": "sowing-date",
@@ -1559,7 +1562,7 @@ const DATA = {
           "desc": "Efficacy-scored recommendations"
         }
       ],
-      "notes": "Well-established. v2 needs field trial data.\n\n- Irrigation status affects treatment type: irrigated farmers prefer premium liquid formulations and spray 50-100% more frequently with prophylactic schedules; rainfed farmers spray reactively with broad-spectrum generics (Pedro)",
+      "notes": "23/3/2026 This information is important to be in dingo so we need to work on an automation on making this faster and incorporate this into dingo\n\n\nWell-established. v2 needs field trial data.\n\n- Irrigation status affects treatment type: irrigated farmers prefer premium liquid formulations and spray 50-100% more frequently with prophylactic schedules; rainfed farmers spray reactively with broad-spectrum generics (Pedro)",
       "tasks": [
         {
           "id": "t21",
@@ -1592,7 +1595,8 @@ const DATA = {
           ],
           "done": false,
           "next": true,
-          "assignee": "Yiannis & Celine"
+          "assignee": "Yiannis & Celine",
+          "asanaUrl": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213717158800676?focus=true"
         },
         {
           "id": "t1773827453109",
@@ -1602,7 +1606,8 @@ const DATA = {
           ],
           "done": false,
           "next": true,
-          "assignee": "Agronomy"
+          "assignee": "Agronomy",
+          "asanaUrl": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213717099312767?focus=true"
         },
         {
           "id": "t1773827489643",
@@ -1612,9 +1617,23 @@ const DATA = {
           ],
           "done": false,
           "next": true,
-          "assignee": "Andjela"
+          "assignee": "Andjela",
+          "asanaUrl": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213717099312769?focus=true"
+        },
+        {
+          "id": "t1774278492726",
+          "desc": "This new layer of information of crop-growth stage treatibility is in dingo",
+          "sources": [
+            "plantix"
+          ],
+          "done": false,
+          "next": true,
+          "assignee": "Albert/Yiannis",
+          "asanaUrl": ""
         }
-      ]
+      ],
+      "priority": "high",
+      "overview": ""
     },
     {
       "id": "demand-forecast",
@@ -2023,7 +2042,7 @@ const DATA = {
       "tasks": []
     }
   ],
-  "lastSaved": "2026-03-20T13:23:29.806Z",
+  "lastSaved": "2026-03-23T15:14:09.065Z",
   "availableTags": [
     "Sales",
     "UX",
