@@ -802,6 +802,58 @@
         {
           "label": "BQ link for acreage UPAG",
           "url": "plantix-8e0ce.data_solutions_prod.stg_upag_crop_statistics"
+        },
+        {
+          "label": "stg_crop_statistics (staging) — Unified crop statistics combining UPAG (field crops) and horticulture. Area in hectares, production in tonnes, yield in kg/ha. All crops, all Indian states/districts.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "stg_horticulture_crop_statistics (staging) — Horticulture crop statistics (fruits, vegetables, spices, plantation crops) from DES, district and state level.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "location_mapping (core) — Hierarchical geographic mapping of locations (country, state, district, subdistrict) with geometries from OpenStreetMap.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_area_volatility (core) — Crop area volatility scores (CV%) from UPAG crop statistics at state and district level. Districts with <3 years fall back to state-level CV.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_states (mart) — All Indian states and union territories. [Lovable demo, Rice/Maize only]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_districts (mart) — Districts that appear in UPAG for Rice or Maize. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_subdistricts (mart) — Subdistricts with cropland in ESRI LULC, with parent district/state IDs. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_district_crop_data (mart) — Per-crop district acreage and volatility from UPAG 2023-24. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_subdistrict_crop_data (mart) — Per-crop subdistrict acreage distributed from district data using LULC cropland shares. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_acreage_trend (mart) — Historical acreage by year at national/state/district/subdistrict level (2017-2025, with YoY % change). [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_acreage_prediction (mart) — Forecasted acreage using linear regression. Band = avg +/- 1 stddev of residuals. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_volatility (mart) — Crop area volatility (CV%) at all geographic levels. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_addressable_market (mart) — State-level TAM per crop combining UPAG acreage with per-hectare fertilizer and plant protection costs. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
         }
       ],
       "overview": "Acreage data from UPAG + cropland to go down to subdistrict level. We assume the distribution of crops in subdistricts is equally distributed.  We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)",
@@ -881,6 +933,10 @@
         {
           "label": "WIP Vision Based Growth stage BQ",
           "url": "https://console.cloud.google.com/bigquery?project=plantix-8e0ce&ws=!1m5!1m4!4m3!1splantix-8e0ce!2scaterpillar!3sgrowth_stage_predictions"
+        },
+        {
+          "label": "stg_crop_stage_timeline (staging) — BBCH crop growth stage timeline. Maps BBCH ranges to stage names with cumulative day offsets from sowing. Covers Rice and Maize. No dedicated downstream mart — feeds into demand forecast and farmer treatment behaviour models.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
         }
       ],
       "links": [
@@ -964,6 +1020,16 @@
           "assignee": "",
           "asanaUrl": ""
         }
+      ],
+      "dataLinks": [
+        {
+          "label": "sw_monsoon_dates (core) — Southwest monsoon onset/withdrawal date ranges by IMD subdivision. Monsoon onset is used as a proxy for sowing date in demand models.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "puma_master (core) — Combined view of farmer profiles and planting data from Dos and Don'ts feature. Tracks actual farmer-entered sowing and harvesting dates.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        }
       ]
     },
     {
@@ -1034,6 +1100,32 @@
           "next": false,
           "assignee": "",
           "asanaUrl": ""
+        }
+      ],
+      "dataLinks": [
+        {
+          "label": "weather_per_day (core) — Aggregated daily weather from ERA5 India. Min/avg/max temperature, relative humidity, rainfall total, and wind speed per location.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "sw_monsoon_dates (core) — Southwest monsoon onset and withdrawal date ranges by IMD meteorological subdivision. Actual observed dates (2020-2025) and climatological normals.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "open_meteo__hourly_forecast (dlt) — Weather forecasts up to 16 days ahead from Open-Meteo API. Temperature, humidity, precipitation, wind, radiation, UV index. Daily schedule.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "open_meteo__hourly_forecast_historical (dlt) — Archived past forecasts from Open-Meteo (what was predicted historically).",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "open_meteo__hourly_actuals (dlt) — Reanalysis/observed weather data from Open-Meteo archive API.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "Asana: Weather data task",
+          "url": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213781787220654?focus=true"
         }
       ]
     },
@@ -1177,7 +1269,37 @@
         }
       ],
       "priority": "high",
-      "overview": ""
+      "overview": "",
+      "dataLinks": [
+        {
+          "label": "dingo_disease_master (core) — Disease master combining crops, diseases, EPPO codes, and disease classification from Dingo CMS.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "dingo_ppp_master (core) — Plant protection products with exploded ingredients and regional ban mapping.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "dingo_treatment_ppp_master (core) — Treatments linking plant protection products to crops and target diseases.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "disease_alerts_ppp (mart) — Aggregates disease alerts with plant protection product information.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_disease_management_options (mart) — Management options for crop-disease combinations indicating curative/preventive treatment availability.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_fertilizers (mart) — Per-crop NPK dosage recommendations from Dingo crop collection. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_demand_splits (mart) — Crop-specific demand breakdown by growth phase and input type (N, P, K, Fungicide, Herbicide, Insecticide). [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        }
+      ]
     },
     {
       "id": "demand-forecast",
@@ -1254,6 +1376,42 @@
         {
           "label": "GitHub",
           "url": "https://github.com/PEAT-AI/cicada"
+        },
+        {
+          "label": "treatable_disease_pressure (core) — Disease Risk Index weighted by treatment application windows. Combines cicada disease forecasts with BBCH-stage treatability using sigmoid entry ramp and hard cutoff at exit.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "india_pesticide_consumption_by_crop (core) — National pesticide AI consumption distributed across Kharif crops and Indian states. Per-hectare rate = AI consumption (kg) / total national cropland (ha).",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "rice_addressable_market (mart) — Total addressable market (INR Cr) for fertilizers, insecticides, fungicides, and herbicides for rice per Indian state.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_category_demand_windows (mart) — Category-level demand windows (Fungicide/Insecticide). Aggregates DRI forecasts to product category, normalised to density summing to 1. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_product_demand_windows (mart) — Product-level demand windows. Distributes category-level demand to branded products using disease shares and sigmoid-weighted application windows. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_category_demand_quantity (mart) — Category-level weekly demand quantity (absolute kg for the state). Covers Fungicide, Insecticide, and Herbicide. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_district_category_demand_quantity (mart) — District-level weekly demand quantity, distributed from state-level proportionally by crop acreage share. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_subdistrict_category_demand_quantity (mart) — Subdistrict-level weekly demand quantity, distributed from district-level by crop acreage share. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_addressable_market (mart) — State-level TAM per crop combining UPAG acreage with per-hectare costs. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
         }
       ],
       "overview": "  Cicada is a Bayesian disease outbreak forecasting system that predicts agricultural disease pressure 1–3 months ahead across 17 Indian states and 3 crops (MAIZE, RICE, COTTON).                                                               \n            \n Training Data                                                                                                                                                                                                                                  \n                                                                                                                                                                                                                                                 \n  - Weekly disease detection counts & total scan counts per state/crop/peat_id, filtered to feedforward_integer >= 3 and dates from 2021 onwards (plantix-8e0ce.data_solutions_prod.health_check_validated)                                      \n  - Disease name → peat_id mapping, filtered to disease/pest classes (plantix-8e0ce.data_solutions_prod.dingo_disease_master)                                                                                                                    \n  - Monsoon onset week per IMD subdivision per year — only for monsoon-aware models (plantix-8e0ce.data_solutions_prod.sw_monsoon_dates)                                                                                                         \n                                                                                                                                                                                                                                                 \n  External Validation Data                                                                                                                                                                                                                       \n                                                                                                                                                                                                                                                 \n  - AAS outbreak/alert event counts by week — all states/crops (plantix-8e0ce.sync_dlt_local.gcs_seeds__aas_{crop}_disease_outbreaks, joined with gcs_seeds__aas_districts and gcs_seeds__aas_disease_peat_mapping)                              \n  - PestDSS ETL threshold observations — Maharashtra only (plantix-8e0ce.sync_dlt_local.gcs_seeds__pestdss_etl_observations)\n  - Manual outbreak presence annotations — AP/Telangana rice only (plantix-8e0ce.sync_dlt_local.gcs_seeds__kharif_rabi_outbreak_annotations)     \n\n                                                                                                                                                                                                                                     \n  End-to-End Pipeline                                                                                                                                                                                                                            \n                                                                                                                                                                                                                                                 \n  1. Data ingestion from BigQuery (read-only)                                                                                                                                                                                                    \n  2. Model training — 6 Bayesian/statistical models (Seasonal Naive, Fourier AR(1), ZI-Fourier AR(1), Monsoon AR(1), ZI-Monsoon AR(1), Prophet)                                                                                                  \n  3. Evaluation — 6-fold expanding-window cross-validation (WIS, calibration, MAE)                                                                                                                                                               \n  4. External validation — against AAS, PestDSS, and manual annotations                                                                                                                                                                          \n  5. Forward forecasting — trains on all data, predicts 13+ weeks ahead                                                                                                                                                                          \n  6. Output — local CSV/JSON/Markdown + optional ClearML logging\n                                                                                                                                                                                                                                                 \n  Validation phase split: year < 2025 = validation, year >= 2025 = held-out test.  ",
@@ -1379,6 +1537,20 @@
           "priority": "low",
           "next": false,
           "assignee": ""
+        }
+      ],
+      "dataLinks": [
+        {
+          "label": "crop_calendar_improved (mart) — Combines crop calendar and Dingo sowing season data into season-specific rows (kharif/rabi) with sowing/harvest windows and growth stage columns.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_crop_types (mart) — Lookup table of crop types available in the dashboard (Rice, Maize). [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_months (mart) — Lookup table mapping month abbreviations to zero-based indices for UI month selector. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
         }
       ]
     },
@@ -1529,6 +1701,20 @@
           "done": false,
           "next": false,
           "assignee": ""
+        }
+      ],
+      "dataLinks": [
+        {
+          "label": "agro_treatment_demand (core) — Agronomic treatment application demand mapped to calendar weeks. Maps BBCH application windows to ISO weeks via sowing dates, using sigmoid entry ramp and hard cutoff at exit. Purely timing-driven (no disease forecast). Deduplicated across companies.",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_agro_category_demand_windows (mart) — Category-level demand windows for herbicides and fertilizers. Purely BBCH-timing-driven, normalised to density summing to 1. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
+        },
+        {
+          "label": "crop_insights_agro_product_demand_windows (mart) — Product-level demand windows for herbicides. Distributes category-level demand to branded products by treatment plan applications. Currently herbicide-only. [Lovable demo]",
+          "url": "https://github.com/PEAT-AI/dagster-dp"
         }
       ]
     },
