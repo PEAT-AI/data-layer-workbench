@@ -1774,6 +1774,19 @@
       "icon": "🪨",
       "notes": "- SoilGrids 2.0 (ISRIC): 250m resolution soil property maps — sand/clay/silt, organic carbon, pH, CEC. Free, CC BY 4.0 via soilgrids.org (Pedro)\n- Soil Health Card portal (soilhealth.dac.gov.in): block-level NPK and micronutrient deficiency %. Updated every 2-3 year testing cycle. Data often stale (2017-2019) (Pedro)",
       "tasks": []
+    },
+    {
+      "id": "fires",
+      "name": "Fires",
+      "icon": "🔥",
+      "notes": "",
+      "tasks": [],
+      "dataLinks": [
+        {
+          "label": "Dagster Layer 1 Nasa Fire Detection from 2020",
+          "url": "https://dagster.peat-cloud.com/assets/nasa_firms_detections"
+        }
+      ]
     }
   ],
   "lastSaved": "2026-03-23T15:14:09.065Z",
