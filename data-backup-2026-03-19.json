@@ -32,7 +32,12 @@
       "personaId": "crop-protection",
       "role": "Regional Marketing Manager",
       "text": "As a Regional Marketing Manager, I want to know when and where I should plan my traditional marketing campaigns and field events, with 1–2 weeks heads up. I need Predictive Heatmaps showing where the Crop Window is opening in the next 14 days to prioritize, at district/group of districts/crop region level depending on brand penetration and agronomic profile.",
-      "layers": [],
+      "layers": [
+        "disease-incidences",
+        "growth-stage",
+        "weeds",
+        "demand-forecast"
+      ],
       "tags": [
         "Sales"
       ]
@@ -42,7 +47,10 @@
       "personaId": "crop-protection",
       "role": "Regional Sales Manager",
       "text": "As a Regional Sales Manager, I want to understand how many bottles/liters of a certain product I should plan for which PIN code/subdistrict based on historical data and future weather patterns. Currently basing off subjective info: last year's brand sales, estimated competitor sales from retailer conversations, crop preference changes, sowing window shifts, and general weather. Need to move from subjective to objective — integrating satellite-derived sowing dates and real-time precipitation to predict Inventory Velocity.",
-      "layers": [],
+      "layers": [
+        "demand-forecast",
+        "treatment"
+      ],
       "tags": [
         "Sales"
       ]
@@ -52,7 +60,13 @@
       "personaId": "crop-protection",
       "role": "Sales Head / Crop Manager",
       "text": "As a Sales Head or Crop Manager, I want an overview of what's happening on the ground right now — which of my products should sell now, and where — while sitting in HQ. I need to compare inventory depletion in real time vs ground reality, identify room to sell more, spot new indicators, and decide if inventory needs to move between regions. An Opportunity Gap Analysis tool: if HQ sees high pest pressure in Region A but low inventory or sales, trigger a message to align the sales plan.",
-      "layers": [],
+      "layers": [
+        "disease-incidences",
+        "weeds",
+        "growth-stage",
+        "acreage",
+        "farmer-treatment-behavior"
+      ],
       "tags": [
         "Sales"
       ]
@@ -62,7 +76,14 @@
       "personaId": "crop-protection",
       "role": "Field Agent / Marketing Team",
       "text": "As a Field Agent or Marketing Team member, I want to know what to talk about with farmers when visiting — which diseases are occurring right now in the surroundings, which of our products I can recommend, and the benefits vs competitor products. The goal is to create product fit in the farmer's mind based on what's happening in nearby villages or similar crop-profile areas, transitioning from shopkeeper/field agent to trusted advisor.",
-      "layers": [],
+      "layers": [
+        "disease-incidences",
+        "sowing-date",
+        "growth-stage",
+        "treatment",
+        "farmer-treatment-behavior",
+        "weeds"
+      ],
       "tags": [
         "Sales"
       ]
@@ -72,7 +93,12 @@
       "personaId": "crop-protection",
       "role": "Retailer",
       "text": "As a Retailer, I want to be knowledgeable when farmers come into my shop — which diseases are spreading now and which are coming in the next 1–3 weeks, and which products to recommend and why. I need pest trends in the region for same or different crops so I can proactively push the right products. This builds trust and repeat business.",
-      "layers": [],
+      "layers": [
+        "demand-forecast",
+        "weeds",
+        "growth-stage",
+        "weather"
+      ],
       "tags": [
         "Sales"
       ]
@@ -82,7 +108,14 @@
       "personaId": "crop-protection",
       "role": "Sales / Marketing Head / Business Head",
       "text": "As a Sales or Marketing Head, Business Head, or Crop Manager, I want to plan expansion into new regions and understand the best regions to go to — where are big pockets and TAM for my products. I need to identify regions with high potential and low penetration, knowing that TAM is always dynamic based on crop preference by farmers each season.",
-      "layers": [],
+      "layers": [
+        "acreage",
+        "treatment",
+        "farmer-value",
+        "farmer-treatment-behavior",
+        "weeds",
+        "demand-forecast"
+      ],
       "tags": [
         "Sales"
       ]
@@ -92,7 +125,11 @@
       "personaId": "crop-protection",
       "role": "State Manager",
       "text": "As a State Manager selling pre-emergence herbicides, I want to know when farmers put seeds into the ground. I need an automated alert when 20% of the district has completed sowing so my sales team can move herbicides to retail counters immediately — not waiting for delayed manual field reports. Sowing window info is needed as soon as the first 10–20 farmers start sowing for the main season.",
-      "layers": [],
+      "layers": [
+        "weeds",
+        "sowing-date",
+        "growth-stage"
+      ],
       "tags": [
         "Sales"
       ]
@@ -102,7 +139,10 @@
       "personaId": "crop-protection",
       "role": "State Manager",
       "text": "As a State Manager selling herbicides, I want to understand which growth stage plants are on the ground right now, because my herbicide sales window depends on precise crop stage timing.",
-      "layers": [],
+      "layers": [
+        "weeds",
+        "growth-stage"
+      ],
       "tags": [
         "Sales"
       ]
@@ -705,7 +745,8 @@
         }
       ],
       "overview": "  Core Calculation (3 dbt SQL files)                                                                                                                                                                                                             \n                                                                                                                                                                                                                                                 \n  1. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_base.sql (535 lines)                                                                                                                                                  \n    - Aggregates health check data over 30-day window                                                                                                                                                                                            \n    - Calculates rolling 7-day weighted disease counts (weighted by inverse of host crops per EPPO code)                                                                                                                                         \n    - Computes frac_disease_7d = disease fraction of crop                                                                                                                                                                                        \n    - Detects daily/weekly percentage changes with dynamic thresholds (90th percentile)                                                                                                                                                          \n  2. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_scores.sql (199 lines)                                                                                                                                                \n    - Classifies incidence: HIGH (>30%), MEDIUM (>10%), LOW (≤10%)                                                                                                                                                                               \n    - Classifies trend: UP/DOWN/STABLE based on weekly change vs dynamic threshold                                                                                                                                                               \n    - Computes alert level (HIGH/MEDIUM/LOW) from incidence × trend matrix                                                                                                                                                                       \n    - Applies management options logic (upgrades if preventive-only treatment)                                                                                                                                                                   \n    - Applies damage score logic (upgrades/downgrades based on economic damage)                                                                                                                                                                  \n    - Adds confidence scores and season strength                                                                                                                                                                                                 \n  3. dbt_project/models/data_solutions/marts/disease_alerts/disease_alerts_thresholds.sql (188 lines)                                                                                                                                            \n    - Percentile-based thresholds (p20-p50) for filtering                                                                                                                                                                                        \n                                                                                                                                                                                                                                                 \n  Supporting macros\n                                                                                                                                                                                                                                                 \n  - dbt_project/macros/disease_alerts_states.sql — eligible Indian states (12)                                                                                                                                                                   \n  - dbt_project/macros/disease_alerts_crops.sql — eligible crops + seasonality (Kharif/Rabi)\n                                                                                                                                                                                                                                                 \n  Dagster orchestration\n                                                                                                                                                                                                                                                 \n  - dagster_dp/customers/syngenta_disease_alerts.py — daily run, publishes to S3 on Mon/Thu                                                                                                                                                      \n  \n  Distribution layer                                                                                                                                                                                                                             \n                  \n  - disease_alerts_report_data.sql → email/sheets                                                                                                                                                                                                \n  - disease_alerts_lizard.sql / _v2.sql → Lizard system\n  - disease_alerts_ppp.sql / disease_alerts_product.sql → pesticide recommendations                                                                                                                                                              \n  - disease_alerts_data_whatsapp.sql → WhatsApp messages                                                                                                                                                                                         \n  \n",
-      "priority": "high"
+      "priority": "high",
+      "completeness": "medium"
     },
     {
       "id": "acreage",
@@ -857,7 +898,8 @@
         }
       ],
       "overview": "Acreage data from UPAG + cropland to go down to subdistrict level. We assume the distribution of crops in subdistricts is equally distributed.  We need to think of any of our solutions to be able to extend this into multiple crops and not manual/different 1:1 (at least major crops/diseases)",
-      "priority": "high"
+      "priority": "high",
+      "completeness": "medium"
     },
     {
       "id": "growth-stage",
@@ -953,7 +995,8 @@
           "url": "https://d2aqfnzdlu8tb9.cloudfront.net/"
         }
       ],
-      "priority": "high"
+      "priority": "high",
+      "completeness": "medium"
     },
     {
       "id": "sowing-date",
@@ -1131,7 +1174,8 @@
           "label": "Asana: Weather data task",
           "url": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213781787220654?focus=true"
         }
-      ]
+      ],
+      "completeness": "medium"
     },
     {
       "id": "farmer-value",
@@ -1303,7 +1347,8 @@
           "label": "crop_insights_crop_demand_splits (mart) — Crop-specific demand breakdown by growth phase and input type (N, P, K, Fungicide, Herbicide, Insecticide). [Lovable demo]",
           "url": "https://github.com/PEAT-AI/dagster-dp"
         }
-      ]
+      ],
+      "completeness": "low"
     },
     {
       "id": "demand-forecast",
@@ -1424,7 +1469,8 @@
           "label": "asana",
           "url": "https://app.asana.com/1/1162751913058161/task/1213538609591741?focus=true"
         }
-      ]
+      ],
+      "completeness": "medium"
     },
     {
       "id": "sales-data",
@@ -1800,7 +1846,7 @@
       "tasks": []
     }
   ],
-  "lastSaved": "2026-03-23T15:14:09.065Z",
+  "lastSaved": "2026-03-26T16:29:01.767Z",
   "availableTags": [
     "Sales",
     "UX",
