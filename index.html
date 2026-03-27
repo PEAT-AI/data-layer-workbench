@@ -1557,7 +1557,7 @@ const DATA = {
           "desc": "Hyperlocal weather stations"
         }
       ],
-      "notes": "Solid external data source. API pipeline stable.\n\n- ERA5-Land reanalysis: daily 2m max/min temperature, 9km resolution, via GEE — needed for GDD computation (Pedro)\n- CHIRPS Precipitation: drought mortality penalty when 4-week rainfall is 60%+ below normal, 5.5km resolution (Pedro)\n- SMAP Soil Moisture: 10km daily surface soil moisture, 2015-present (Pedro)",
+      "notes": "Solid external data source. API pipeline stable.\n\n- ERA5-Land reanalysis: daily 2m max/min temperature, 9km resolution, via GEE — needed for GDD computation (Pedro)\n- CHIRPS Precipitation: drought mortality penalty when 4-week rainfall is 60%+ below normal, 5.5km resolution (Pedro)\n- SMAP Soil Moisture: 10km daily surface soil moisture, 2015-present (Pedro)\n\nSoil moisture is available at 4 depth levels in both ERA5 and Open-Meteo assets. Near-real-time coverage (filling the 3-month ERA5 lag) via Open-Meteo pipelines is built and ready but requires activation of an Open-Meteo Standard plan subscription (~30 EUR/month).",
       "tasks": [
         {
           "id": "t15",
@@ -1607,31 +1607,45 @@ const DATA = {
       ],
       "dataLinks": [
         {
-          "label": "weather_per_day (core) — Aggregated daily weather from ERA5 India. Min/avg/max temperature, relative humidity, rainfall total, and wind speed per location.",
-          "url": "https://github.com/PEAT-AI/dagster-dp"
-        },
-        {
           "label": "sw_monsoon_dates (core) — Southwest monsoon onset and withdrawal date ranges by IMD meteorological subdivision. Actual observed dates (2020-2025) and climatological normals.",
-          "url": "https://github.com/PEAT-AI/dagster-dp"
-        },
-        {
-          "label": "open_meteo__hourly_forecast (dlt) — Weather forecasts up to 16 days ahead from Open-Meteo API. Temperature, humidity, precipitation, wind, radiation, UV index. Daily schedule.",
-          "url": "https://github.com/PEAT-AI/dagster-dp"
-        },
-        {
-          "label": "open_meteo__hourly_forecast_historical (dlt) — Archived past forecasts from Open-Meteo (what was predicted historically).",
-          "url": "https://github.com/PEAT-AI/dagster-dp"
-        },
-        {
-          "label": "open_meteo__hourly_actuals (dlt) — Reanalysis/observed weather data from Open-Meteo archive API.",
           "url": "https://github.com/PEAT-AI/dagster-dp"
         },
         {
           "label": "Asana: Weather data task",
           "url": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213781787220654?focus=true"
+        },
+        {
+          "label": "era5_india (source) — Daily ERA5 reanalysis for India: temperature, humidity, rainfall, wind speed, soil moisture at 4 depth levels. Daily load with ~3 months lag.",
+          "url": "https://dagster.peat-cloud.com/assets/era5_india"
+        },
+        {
+          "label": "era5_h3_weekly (core) — Weekly H3 (res 6) aggregation of ERA5 India at subdistrict level. Loads every Monday.",
+          "url": "https://dagster.peat-cloud.com/assets/era5_h3_weekly"
+        },
+        {
+          "label": "open_meteo_era5_india_recent (source) — ERA5 reanalysis from Open-Meteo API, 0.25° India grid, 5-day lag. 11 weather variables incl. soil moisture. Pending Open-Meteo Standard plan (~30 EUR/month).",
+          "url": "https://dagster.peat-cloud.com/assets/open_meteo_era5_india_recent"
+        },
+        {
+          "label": "open_meteo_era5_india_forecast (source) — 7-day weather forecast from Open-Meteo API, same 0.25° India grid. Daily schedule (6 AM UTC). Pending subscription.",
+          "url": "https://dagster.peat-cloud.com/assets/open_meteo_era5_india_forecast"
+        },
+        {
+          "label": "stg_era5_india_combined (staging) — dbt view unioning era5_india + open_meteo_era5_india_recent + open_meteo_era5_india_forecast into a single aligned schema. Source column indicates origin.",
+          "url": "https://console.cloud.google.com/bigquery?project=plantix-8e0ce&ws=!1m5!1m4!4m3!1splantix-8e0ce!2sdata_solutions_prod!3sstg_era5_india_combined"
         }
       ],
-      "completeness": "medium"
+      "completeness": "medium",
+      "links": [
+        {
+          "label": "Asana: Weather data task",
+          "url": "https://app.asana.com/1/1162751913058161/project/1213717171617853/task/1213781787220654"
+        },
+        {
+          "label": "Asana: ERA5/Open-Meteo implementation",
+          "url": "https://app.asana.com/1/1162751913058161/task/1213781821493185"
+        }
+      ]
     },
     {
       "id": "farmer-value",
